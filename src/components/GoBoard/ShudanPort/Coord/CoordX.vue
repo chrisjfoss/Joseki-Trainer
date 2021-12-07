@@ -32,7 +32,9 @@ export default defineComponent({
 <template>
   <div class="shudan-coord-container" :style="style">
     <div v-for="(x, i) in xs" :key="i" class="shudan-coord">
-      {{ coordX ?? defaultCoordText(i) }}
+      <span class="shudan-coord__text">
+        {{ coordX || defaultCoordText(i) }}
+      </span>
     </div>
   </div>
 </template>
@@ -42,8 +44,11 @@ export default defineComponent({
   text-align: center;
 }
 .shudan-coord {
-  display: block;
-  width: 2.5em;
-  font-size: 0.6em;
+  display: flex;
+  justify-content: center;
+  width: 1em;
+  &__text {
+    font-size: 0.6em;
+  }
 }
 </style>

@@ -47,6 +47,7 @@ export default defineComponent({
     selectedTop: Boolean,
     selectedBottom: Boolean
   },
+  emits: vertexEvents,
   setup(props, context) {
     const vertexClasses = computed(() => {
       return classnames(
@@ -84,14 +85,16 @@ export default defineComponent({
       );
     });
 
-    const handler = (eventName: string) => (e: unknown) => {
-      context.emit(eventName, e);
+    const eventHandler = (eventName: string) => {
+      context.emit(eventName, props.position);
     };
 
     const vertexEventHandlers = computed(() => {
-      return vertexEvents.map((eventName) => ({
-        [eventName.toLowerCase()]: handler(eventName)
-      }));
+      const eventHandlers: Record<string, unknown> = {};
+      for (const eventName of vertexEvents) {
+        eventHandlers[eventName] = () => eventHandler(eventName);
+      }
+      return eventHandlers;
     });
 
     const absoluteStyle = (zIndex?: number): CSSProperties => ({
@@ -108,8 +111,8 @@ export default defineComponent({
       classnames,
       vertexClasses,
       vertexEventHandlers,
-      handler,
-      paintOpacity
+      paintOpacity,
+      eventHandler
     };
   }
 });

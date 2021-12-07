@@ -6,25 +6,25 @@ export default defineComponent({
   props: {
     width: {
       type: Number,
-      required: true,
+      required: true
     },
     height: {
       type: Number,
-      required: true,
+      required: true
     },
     xs: {
       type: Array as PropType<number[]>,
-      required: true,
+      required: true
     },
     ys: {
       type: Array as PropType<number[]>,
-      required: true,
+      required: true
     },
     hoshis: {
       type: Array as PropType<[any, any][]>,
-      required: true,
-    },
-  },
+      required: true
+    }
+  }
 });
 </script>
 <template>
@@ -61,8 +61,8 @@ export default defineComponent({
           v-if="hoshi[0] >= 0 && hoshi[1] >= 0"
           :key="hoshi.join('-')"
           class="shudan-hoshi"
-          :cx="`calc(${(2 * xs.indexOf(hoshi[0]) + 1) * 0.5}em + 0.5px)`"
-          :cy="`calc(${(2 * ys.indexOf(hoshi[1]) + 1) * 0.5}em + 0.5px)`"
+          :cx="`${(2 * xs.indexOf(hoshi[0]) + 1) * 0.5}em`"
+          :cy="`${(2 * ys.indexOf(hoshi[1]) + 1) * 0.5}em`"
           :r="'.1em'"
         />
       </template>

@@ -13,6 +13,8 @@
   },
   "main": "background.js",
   "dependencies": {
+    "@juggle/resize-observer": "^3.3.1",
+    "@sabaki/go-board": "^1.4.3",
     "@types/lodash": "^4.14.177",
     "classnames": "^2.3.1",
     "core-js": "^3.6.5",

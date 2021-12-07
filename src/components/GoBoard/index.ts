@@ -1,2 +1,2 @@
-import GoBoard from "./GoBoard.vue";
-export default GoBoard;
+import Goban from "./ShudanPort";
+export default Goban;

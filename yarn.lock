@@ -997,6 +997,11 @@
     cssnano-preset-default "^4.0.0"
     postcss "^7.0.0"
 
+"@juggle/resize-observer@^3.3.1":
+  version "3.3.1"
+  resolved "https://registry.yarnpkg.com/@juggle/resize-observer/-/resize-observer-3.3.1.tgz#b50a781709c81e10701004214340f25475a171a0"
+  integrity sha512-zMM9Ds+SawiUkakS7y94Ymqx+S0ORzpG3frZirN3l+UlXUmSUR7hF4wxCVqW+ei94JzV5kt0uXBcoOEAuiydrw==
+
 "@malept/cross-spawn-promise@^1.1.0":
   version "1.1.1"
   resolved "https://registry.npmjs.org/@malept/cross-spawn-promise/-/cross-spawn-promise-1.1.1.tgz"
@@ -1063,6 +1068,11 @@
   dependencies:
     mkdirp "^1.0.4"
     rimraf "^3.0.2"
+
+"@sabaki/go-board@^1.4.3":
+  version "1.4.3"
+  resolved "https://registry.yarnpkg.com/@sabaki/go-board/-/go-board-1.4.3.tgz#04304bdc3fc10d1258b7db23dca292c1e87f4b60"
+  integrity sha512-tXonP7vw7bYcXKSVrN1bhkb/QQi5EfTbDSflBffSp2iabbFbz4JyhEyw0ekbuwR0ntBq6iHky6BfCGF69Z4ttg==
 
 "@sindresorhus/is@^0.14.0":
   version "0.14.0"

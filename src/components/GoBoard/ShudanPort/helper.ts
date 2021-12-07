@@ -1,16 +1,16 @@
 export const alpha = "ABCDEFGHJKLMNOPQRSTUVWXYZ";
 export const vertexEvents = [
-  "Click",
-  "MouseDown",
-  "MouseUp",
-  "MouseMove",
-  "MouseEnter",
-  "MouseLeave",
-  "PointerDown",
-  "PointerUp",
-  "PointerMove",
-  "PointerEnter",
-  "PointerLeave",
+  "click",
+  "mousedown",
+  "mouseup",
+  "mousemove",
+  "mouseenter",
+  "mouseleave",
+  "pointerdown",
+  "pointerup",
+  "pointermove",
+  "pointerenter",
+  "pointerleave",
 ];
 
 export const range = (n: number) =>

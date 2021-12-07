@@ -3,6 +3,7 @@ import {
   computed,
   defineComponent,
   PropType,
+  Ref,
   ref,
   watch,
   watchEffect
@@ -23,6 +24,7 @@ import type {
   HeatVertex,
   LineMarker
 } from "./types";
+import { ResizeObserver } from "@juggle/resize-observer";
 
 export default defineComponent({
   name: "Goban",
@@ -59,11 +61,11 @@ export default defineComponent({
     },
     coordX: {
       type: [Number, String],
-      default: ""
+      default: 0
     },
     coordY: {
       type: [Number, String],
-      default: ""
+      default: 0
     },
     signMap: {
       type: Array as PropType<Sign[][]>,
@@ -125,7 +127,14 @@ export default defineComponent({
       default: () => [0, Infinity]
     }
   },
+  emits: helper.vertexEvents.map((event) => `${event}:vertex`),
   setup(props, context) {
+    const goban: Ref<HTMLBaseElement | null> = ref(null);
+    const resizeObserver = new ResizeObserver(() => {
+      console.log(gobanWidth.value);
+      gobanWidth.value = goban.value?.offsetWidth ?? 0;
+    });
+    const gobanWidth = ref(goban.value?.offsetWidth ?? 0);
     const width = computed(() => {
       return props.signMap.length === 0 ? 0 : props.signMap[0].length;
     });
@@ -151,6 +160,13 @@ export default defineComponent({
     const computedVertexSize = computed(() => {
       const numericValue = props.vertexSize.toString().replace(/[^0-9.]/g, "");
       const unit = props.vertexSize.toString().replace(/[0-9.]/g, "") || "rem";
+
+      if (unit === "%") {
+        if (goban.value) resizeObserver.observe(goban.value);
+        return `${gobanWidth.value * (parseFloat(numericValue) / 100)}px`;
+      } else if (goban?.value) {
+        resizeObserver.unobserve(goban.value);
+      }
       return `${numericValue}${unit}`;
     });
 
@@ -227,15 +243,33 @@ export default defineComponent({
       );
     });
 
-    const vertexHandler = (eventName: string) => (e: unknown) => {
-      context.emit("onVertex" + eventName, e);
+    const shudanGobanStyles = computed(() => {
+      return {
+        "font-size": `${computedVertexSize.value}`,
+        "--goban-horizontal-length": xs.value.length,
+        "--goban-vertical-length": ys.value.length,
+        ...props.style
+      };
+    });
+
+    const eventHandler = (eventName: string, e: unknown) => {
+      context.emit(eventName, e);
     };
+
+    const vertexEventHandlers = computed(() => {
+      const eventHandlers: Record<string, unknown> = {};
+      for (const eventName of helper.vertexEvents) {
+        eventHandlers[eventName] = (e: unknown) =>
+          eventHandler(`${eventName}:vertex`, e);
+      }
+      return eventHandlers;
+    });
 
     return {
       animatedVerticesNeighborhoodMap,
       dynamicClasses,
       helper,
-      vertexHandler,
+      vertexEventHandlers,
       xs,
       ys,
       width,
@@ -243,125 +277,124 @@ export default defineComponent({
       hoshis,
       shiftMap,
       randomMap,
-      computedVertexSize
+      computedVertexSize,
+      shudanGobanStyles,
+      goban
     };
   }
 });
 </script>
 <template>
-  <div
-    id="id"
-    class="shudan-goban shudan-goban-image"
-    :class="dynamicClasses"
-    :style="{
-      'font-size': `${computedVertexSize}`,
-      '--goban-horizontal-length': xs.length,
-      '--goban-vertical-length': ys.length,
-      ...style,
-    } as Record<string, unknown>"
-  >
-    <CoordX
-      v-if="showCoordinates"
-      :xs="xs"
-      :coord-x="coordX"
-      :style="{ 'grid-row': 1, 'grid-column': 2 }"
-    />
-    <CoordY
-      v-if="showCoordinates"
-      :height="height"
-      :ys="ys"
-      :coord-y="coordY"
-      :style="{ 'grid-row': 2, 'grid-column': 1 }"
-    />
-    <div class="shudan-content">
-      <Grid
-        :width="width"
-        :height="height"
+  <div ref="goban" class="goban-container">
+    <div
+      class="shudan-goban shudan-goban-image"
+      :class="dynamicClasses"
+      :style="shudanGobanStyles"
+    >
+      <CoordX
+        v-if="showCoordinates"
         :xs="xs"
-        :ys="ys"
-        :hoshis="hoshis"
+        :style="{ 'grid-row': 1, 'grid-column': 2 }"
       />
-      <div class="shudan-vertices">
-        <template v-for="y in ys">
-          <Vertex
-            v-for="x in xs"
-            :key="[x, y].join('-')"
-            :position="[x, y]"
-            :shift="
-              fuzzyStonePlacement
-                ? helper.getValueAtVertex(shiftMap, [x, y])
-                : 0
-            "
-            :random="helper.getValueAtVertex(randomMap, [x, y])"
-            :sign="helper.getValueAtVertex(signMap, [x, y])"
-            :heat="helper.getValueAtVertex(heatMap, [x, y], null)"
-            :paint="helper.getValueAtVertex(paintMap, [x, y])"
-            :marker="helper.getValueAtVertex(markerMap, [x, y], null)"
-            :ghost-stone="helper.getValueAtVertex(ghostStoneMap, [x, y], null)"
-            :dimmed="helper.hasVertex(dimmedVertices, [x, y])"
-            :animate="helper.hasVertex(animatedVerticesNeighborhoodMap, [x, y])"
-            :selected="helper.hasVertex(selectedVertices, [x, y])"
-            :selected-left="
-              helper.hasVertex(selectedVertices, [x, y]) &&
-              helper.hasVertex(selectedVertices, [x - 1, y])
-            "
-            :selected-right="
-              helper.hasVertex(selectedVertices, [x, y]) &&
-              helper.hasVertex(selectedVertices, [x + 1, y])
-            "
-            :selected-top="
-              helper.hasVertex(selectedVertices, [x, y]) &&
-              helper.hasVertex(selectedVertices, [x, y - 1])
-            "
-            :selected-bottom="
-              helper.hasVertex(selectedVertices, [x, y]) &&
-              helper.hasVertex(selectedVertices, [x, y + 1])
-            "
-            v-on="
-              helper.vertexEvents.map((e) => ({
-                [e]: vertexHandler(e)
-              }))
-            "
-          />
-        </template>
-        <div class="shudan-lines">
-          <div
-            :style="{
-              position: 'absolute',
-              top: `-${rangeY[0]}em`,
-              left: `-${rangeX[0]}em`,
-              width: `${width}em`,
-              height: `${height}em`
-            }"
-          >
-            <Line
-              v-for="(line, i) in lines"
-              :key="i"
-              :v1="line.v1"
-              :v2="line.v2"
-              :type="line.type"
-              :vertex-size="vertexSize"
+      <CoordY
+        v-if="showCoordinates"
+        :height="height"
+        :ys="ys"
+        :style="{ 'grid-row': 2, 'grid-column': 1 }"
+      />
+      <div class="shudan-content">
+        <Grid
+          :width="width"
+          :height="height"
+          :xs="xs"
+          :ys="ys"
+          :hoshis="hoshis"
+        />
+        <div class="shudan-vertices">
+          <template v-for="y in ys">
+            <Vertex
+              v-for="x in xs"
+              :key="[x, y].join('-')"
+              :position="[x, y]"
+              :shift="
+                fuzzyStonePlacement
+                  ? helper.getValueAtVertex(shiftMap, [x, y])
+                  : 0
+              "
+              :random="helper.getValueAtVertex(randomMap, [x, y])"
+              :sign="helper.getValueAtVertex(signMap, [x, y])"
+              :heat="helper.getValueAtVertex(heatMap, [x, y], null)"
+              :paint="helper.getValueAtVertex(paintMap, [x, y])"
+              :marker="helper.getValueAtVertex(markerMap, [x, y], null)"
+              :ghost-stone="
+                helper.getValueAtVertex(ghostStoneMap, [x, y], null)
+              "
+              :dimmed="helper.hasVertex(dimmedVertices, [x, y])"
+              :animate="
+                helper.hasVertex(animatedVerticesNeighborhoodMap, [x, y])
+              "
+              :selected="helper.hasVertex(selectedVertices, [x, y])"
+              :selected-left="
+                helper.hasVertex(selectedVertices, [x, y]) &&
+                helper.hasVertex(selectedVertices, [x - 1, y])
+              "
+              :selected-right="
+                helper.hasVertex(selectedVertices, [x, y]) &&
+                helper.hasVertex(selectedVertices, [x + 1, y])
+              "
+              :selected-top="
+                helper.hasVertex(selectedVertices, [x, y]) &&
+                helper.hasVertex(selectedVertices, [x, y - 1])
+              "
+              :selected-bottom="
+                helper.hasVertex(selectedVertices, [x, y]) &&
+                helper.hasVertex(selectedVertices, [x, y + 1])
+              "
+              v-on="vertexEventHandlers"
             />
+          </template>
+          <div class="shudan-lines">
+            <div
+              :style="{
+                position: 'absolute',
+                top: `-${rangeY[0]}em`,
+                left: `-${rangeX[0]}em`,
+                width: `${width}em`,
+                height: `${height}em`
+              }"
+            >
+              <Line
+                v-for="(line, i) in lines"
+                :key="i"
+                :v1="line.v1"
+                :v2="line.v2"
+                :type="line.type"
+                :vertex-size="vertexSize"
+              />
+            </div>
           </div>
         </div>
       </div>
+      <CoordY
+        v-if="showCoordinates"
+        :height="height"
+        :ys="ys"
+        :coord-y="coordY"
+        :style="{ 'grid-row': 2, 'grid-column': 3 }"
+      />
+      <CoordX
+        v-if="showCoordinates"
+        :xs="xs"
+        :coord-x="coordX"
+        :style="{ 'grid-row': 3, 'grid-column': 2 }"
+      />
     </div>
-    <CoordY
-      v-if="showCoordinates"
-      :height="height"
-      :ys="ys"
-      :coord-y="coordY"
-      :style="{ 'grid-row': 2, 'grid-column': 3 }"
-    />
-    <CoordX
-      v-if="showCoordinates"
-      :xs="xs"
-      :coord-x="coordX"
-      :style="{ 'grid-row': 3, 'grid-column': 2 }"
-    />
   </div>
 </template>
 <style lang="scss">
+.goban-container {
+  width: 100%;
+}
 .shudan-goban {
   --shudan-board-border-width: 0.25em;
   --shudan-board-border-color: #ca933a;
