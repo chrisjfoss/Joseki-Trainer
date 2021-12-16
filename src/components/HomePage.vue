@@ -1,23 +1,3 @@
-<template>
-  <div class="main" @keyup.up="previousMove" @keyup.down="nextMove">
-    <MoveDisplay
-      :moves="moveList"
-      :turn="turn"
-      @mouseenter="setHoveredBoard"
-      @mouseleave:all="setHoveredBoard(null)"
-      @click="jumpToPosition"
-    />
-    <GoBoard
-      v-model:player="player"
-      v-model:moveList="moveList"
-      v-model:turn="turn"
-      :board="displayBoard"
-      show-coordinates
-      @update:board="(val) => (board = val)"
-    />
-  </div>
-</template>
-
 <script lang="ts">
 import {
   computed,
@@ -25,26 +5,31 @@ import {
   onBeforeUnmount,
   onMounted,
   Ref,
-  ref
+  ref,
+  watchEffect
 } from "vue";
 import GoBoard from "./GoBoard.vue";
-import Board from "@sabaki/go-board";
+import Board, { Vertex } from "@sabaki/go-board";
 import type { MoveList, Move } from "../types";
 import MoveDisplay from "./MoveDisplay.vue";
+
+import { Matrix } from "@/utils";
+import { PositionApi, MoveApi, DatabaseApi } from "@/api";
+import { Player } from "@/db/types";
 
 export default defineComponent({
   name: "HomePage",
   components: { GoBoard, MoveDisplay },
   setup() {
-    const rows = 9;
-    const columns = 9;
+    const rows = ref(9);
+    const columns = ref(9);
 
     const player: Ref<1 | -1> = ref(1);
     const turn: Ref<number> = ref(0);
-    const board = ref(Board.fromDimensions(rows, columns));
+    const board = ref(Board.fromDimensions(rows.value, columns.value));
     const moveList = ref([
       {
-        board: Board.fromDimensions(rows, columns),
+        board: Board.fromDimensions(rows.value, columns.value),
         player: -1,
         priorMove: null
       } as Move
@@ -54,6 +39,66 @@ export default defineComponent({
     const displayBoard = computed(() => {
       return hoveredBoard.value ?? board.value;
     });
+
+    const ghostStones = ref(
+      Array(rows.value)
+        .fill(null)
+        .map(() => Array(columns.value).fill(null))
+    );
+
+    watchEffect(async () => {
+      const dbPosition = await PositionApi.getPositionFromBoard(
+        displayBoard.value,
+        player.value
+      );
+      const newGhostStones = Array(rows.value)
+        .fill(null)
+        .map(() => Array(columns.value).fill(null));
+      if (dbPosition) {
+        dbPosition.candidateMoves.forEach((move) => {
+          newGhostStones[move.point.y][move.point.x] = {
+            sign: player.value,
+            type: "interesting",
+            faint: true
+          };
+        });
+      }
+      ghostStones.value = newGhostStones;
+    });
+
+    const saveMoves = async () => {
+      let priorBoard: Board | null = null;
+
+      for (let i = 0; i <= turn.value; ++i) {
+        const move = moveList.value[i];
+        if (priorBoard && move.priorMove) {
+          await MoveApi.saveMove(
+            move.priorMove,
+            move.board,
+            (move.player * -1) as Player,
+            priorBoard
+          );
+        }
+        priorBoard = move.board;
+      }
+    };
+
+    const getAllMoves = async () => {
+      const moves = await MoveApi.getAllMoves();
+      console.log(moves);
+    };
+
+    const getAllPositions = async () => {
+      const positions = await PositionApi.getAllPositions();
+      console.log(positions);
+    };
+
+    const getPosition = async () => {
+      console.log(
+        "Position: ",
+        await PositionApi.getPositionFromBoard(board.value, player.value)
+      );
+    };
 
     const setHoveredBoard = (move: Move | null) => {
       hoveredBoard.value = move?.board ?? null;
@@ -90,6 +135,29 @@ export default defineComponent({
       }
     };
 
+    const transform = (transformation: Matrix.Transformation) => {
+      for (let i = 0; i < moveList.value.length; ++i) {
+        const newMoveList = [...moveList.value];
+        newMoveList[i].board.signMap = Matrix.getTransformation(
+          transformation,
+          newMoveList[i].board.signMap
+        );
+        if (newMoveList[i].priorMove) {
+          newMoveList[i].priorMove = Matrix.getVerticeTransformation(
+            newMoveList[i].priorMove as Vertex,
+            transformation,
+            newMoveList[i].board.width,
+            newMoveList[i].board.height
+          );
+        }
+        moveList.value = newMoveList;
+      }
+    };
+
+    const deleteDatabase = async () => {
+      await DatabaseApi.deleteDatabase();
+    };
+
     onMounted(() => {
       window.addEventListener("keydown", cycleMove);
     });
@@ -107,11 +175,54 @@ export default defineComponent({
       jumpToPosition,
       turn,
       previousMove,
-      nextMove
+      nextMove,
+      Transformation: Matrix.Transformation,
+      transform,
+      saveMoves,
+      getPosition,
+      deleteDatabase,
+      getAllMoves,
+      getAllPositions,
+      ghostStones
     };
   }
 });
 </script>
+
+<template>
+  <div class="main" @keyup.up="previousMove" @keyup.down="nextMove">
+    <MoveDisplay
+      :moves="moveList"
+      :turn="turn"
+      :board-height="board.height"
+      @mouseenter="setHoveredBoard"
+      @mouseleave:all="setHoveredBoard(null)"
+      @click="jumpToPosition"
+    />
+    <GoBoard
+      v-model:player="player"
+      v-model:moveList="moveList"
+      v-model:turn="turn"
+      width="75%"
+      :board="displayBoard"
+      show-coordinates
+      :ghost-stones="ghostStones"
+      @update:board="(val) => (board = val)"
+    />
+    <button @click="transform(Transformation.rot90)">Rotate 90</button>
+    <button @click="transform(Transformation.rot180)">Rotate 180</button>
+    <button @click="transform(Transformation.rot270)">Rotate 270</button>
+    <button @click="transform(Transformation.mirror)">Mirror</button>
+    <button @click="transform(Transformation.mirrorRot90)">Mirror 90</button>
+    <button @click="transform(Transformation.mirrorRot180)">Mirror 180</button>
+    <button @click="transform(Transformation.mirrorRot270)">Mirror 270</button>
+    <button @click="saveMoves()">Save</button>
+    <button @click="getPosition()">Get Current Position</button>
+    <button @click="deleteDatabase()">Delete Database</button>
+    <button @click="getAllMoves()">Get All Moves</button>
+    <button @click="getAllPositions()">Get All Positions</button>
+  </div>
+</template>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>

@@ -6,20 +6,20 @@ export default defineComponent({
   props: {
     v1: {
       type: Object as () => [any, any],
-      required: true,
+      required: true
     },
     v2: {
       type: Object as () => [any, any],
-      required: true,
+      required: true
     },
     type: {
       type: String,
-      default: "line",
+      default: "line"
     },
     vertexSize: {
       type: [Number, String],
-      default: "1.5rem",
-    },
+      default: "1.5rem"
+    }
   },
   setup(props) {
     const vertexSizeNumber = computed(() =>
@@ -28,7 +28,6 @@ export default defineComponent({
     const vertexSizeUnit = computed(
       () => props.vertexSize.toString().replace(/[0-9.]/g, "") || "rem"
     );
-    console.log(vertexSizeNumber.value, vertexSizeUnit.value);
     const [pos1, pos2] = [props.v1, props.v2].map((v) =>
       v.map((x) => x * vertexSizeNumber.value)
     );
@@ -47,14 +46,14 @@ export default defineComponent({
         transform: `translateX(${-length / 2}${
           vertexSizeUnit.value
         }) rotate(${angle}deg)`,
-        width: length + vertexSizeUnit.value,
+        width: length + vertexSizeUnit.value
       };
     });
     return {
       vertexEquals,
-      styles,
+      styles
     };
-  },
+  }
 });
 </script>
 <template>

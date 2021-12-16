@@ -15,7 +15,11 @@ export default defineComponent({
     turn: {
       type: Number,
       required: true
-    }
+    },
+    boardHeight: {
+      type: Number,
+      required: true
+    },
   },
   emits: ["mouseenter", "mouseleave", "click", "mouseleave:all"],
   setup(props, context) {
@@ -23,7 +27,7 @@ export default defineComponent({
       if (!vertex) {
         return "";
       }
-      return `${alpha[vertex[0]]}${vertex[1] + 1}`;
+      return `${alpha[vertex[0]]}${props.boardHeight - vertex[1]}`;
     };
 
     const emitMouseEnter = (move: Move) => {

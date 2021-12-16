@@ -3,8 +3,9 @@ import { defineComponent } from "@vue/runtime-core";
 import { computed, ref } from "vue";
 import Goban from "./GoBoard/ShudanPort";
 import Board from "@sabaki/go-board";
-import { Vertex } from "./GoBoard/ShudanPort/types";
+import { GhostStone, Vertex } from "./GoBoard/ShudanPort/types";
 import { MoveList } from "@/types";
+import _ from "lodash";
 
 export default defineComponent({
   name: "GoBoard",
@@ -35,6 +36,11 @@ export default defineComponent({
       type: Boolean,
       required: false,
       default: false
+    },
+    ghostStones: {
+      type: Array as () => GhostStone[][],
+      required: false,
+      default: () => []
     }
   },
   emits: ["update:player", "update:board", "update:moveList", "update:turn"],
@@ -48,37 +54,39 @@ export default defineComponent({
       }${widthUnitPart}`;
     });
 
-    const ghostStoneMap = ref(
-      Array(props.board.height)
-        .fill(null)
-        .map(() => Array(props.board.width).fill(null))
-    );
+    const ghostStoneMap = computed(() => {
+      const returnMap =
+        props.ghostStones === []
+          ? Array(props.board.height)
+              .fill(null)
+              .map(() => Array(props.board.width).fill(null))
+          : _.cloneDeep(props.ghostStones);
 
-    const mostRecentVertexAdd = ref<Vertex | null>(null);
-
-    const addGhostStone = (vertex: Vertex) => {
-      const [x, y] = vertex;
-      mostRecentVertexAdd.value = vertex;
-      return new Promise(() => {
-        if (
-          mostRecentVertexAdd.value &&
-          mostRecentVertexAdd.value[0] === vertex[0] &&
-          mostRecentVertexAdd.value[1] === vertex[1] &&
-          ghostStoneMap.value[y][x] === null &&
-          !props.board.get(vertex)
-        ) {
-          ghostStoneMap.value[y][x] = {
+      try {
+        if (highlightedVertex.value) {
+          returnMap[highlightedVertex.value[1]][highlightedVertex.value[0]] = {
             sign: props.player,
             type: null,
             faint: true
           };
         }
-      });
+      } catch {
+        // Do nothing
+      }
+
+      return returnMap;
+    });
+
+    const highlightedVertex = ref<Vertex | null>(null);
+
+    const addGhostStone = (vertex: Vertex) => {
+      highlightedVertex.value = vertex;
     };
 
     const removeGhostStone = (vertex: Vertex) => {
-      const [x, y] = vertex;
-      ghostStoneMap.value[y][x] = null;
+      if (highlightedVertex.value === vertex) {
+        highlightedVertex.value = null;
+      }
     };
 
     const placeStone = (vertex: Vertex) => {

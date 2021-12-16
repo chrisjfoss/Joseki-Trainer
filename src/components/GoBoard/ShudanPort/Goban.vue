@@ -131,7 +131,6 @@ export default defineComponent({
   setup(props, context) {
     const goban: Ref<HTMLBaseElement | null> = ref(null);
     const resizeObserver = new ResizeObserver(() => {
-      console.log(gobanWidth.value);
       gobanWidth.value = goban.value?.offsetWidth ?? 0;
     });
     const gobanWidth = ref(goban.value?.offsetWidth ?? 0);
