@@ -1,4 +1,3 @@
-import { Matrix } from "@/utils";
 import { IndexableType } from "dexie";
 
 export interface Move {
@@ -11,4 +10,10 @@ export interface Move {
   positionId: IndexableType;
   previousPositionId: IndexableType;
   comments: string;
+
+  deck: number;
+  nextSessionTimestamp: number;
+
+  numberOfAttempts: number;
+  numberOfSuccesses: number;
 }

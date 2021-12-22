@@ -1,5 +1,6 @@
 import Board, { Sign, Vertex } from "@sabaki/go-board";
 import * as Matrix from "./matrixUtil";
+import * as Leitner from "./leitner";
 
 class SingletonUtilStorage {
   public static storedBoard: Board;
@@ -192,6 +193,7 @@ const getPositionStringForTransformation = (
 
 export {
   Matrix,
+  Leitner,
   getPositionString,
   getAllPositionStrings,
   getPositionStringForTransformation,

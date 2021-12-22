@@ -1,12 +1,20 @@
 <template>
-  <router-view></router-view>
+  Test
+  <Header />
+  <Train />
 </template>
 
 <script lang="ts">
 import { defineComponent } from "vue";
+import Train from "../components/Train.vue";
+import Header from "../components/Header.vue";
 
 export default defineComponent({
-  name: "App"
+  name: "TrainingPage",
+  components: {
+    Header,
+    Train
+  }
 });
 </script>
 

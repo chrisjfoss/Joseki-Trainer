@@ -20,6 +20,10 @@ export const getAllPositions = async () => {
   return await db.positions.toArray();
 };
 
+export const getPositionById = async (id: IndexableType) => {
+  return await db.positions.get(id);
+};
+
 export const getOriginalPositionFromBoard = async (
   board: GoBoard,
   player: Player

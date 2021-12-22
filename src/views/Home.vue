@@ -1,4 +1,41 @@
+<template>
+  <Header />
+  <div class="main" @keyup.up="previousMove" @keyup.down="nextMove">
+    <MoveDisplay
+      :moves="moveList"
+      :turn="turn"
+      :board-height="board.height"
+      @mouseenter="setHoveredBoard"
+      @mouseleave:all="setHoveredBoard(null)"
+      @click="jumpToPosition"
+    />
+    <GoBoard
+      v-model:player="player"
+      v-model:moveList="moveList"
+      v-model:turn="turn"
+      width="75%"
+      :board="displayBoard"
+      show-coordinates
+      :ghost-stones="ghostStones"
+      @update:board="(val) => (board = val)"
+    />
+    <button @click="transform(Transformation.rot90)">Rotate 90</button>
+    <button @click="transform(Transformation.rot180)">Rotate 180</button>
+    <button @click="transform(Transformation.rot270)">Rotate 270</button>
+    <button @click="transform(Transformation.mirror)">Mirror</button>
+    <button @click="transform(Transformation.mirrorRot90)">Mirror 90</button>
+    <button @click="transform(Transformation.mirrorRot180)">Mirror 180</button>
+    <button @click="transform(Transformation.mirrorRot270)">Mirror 270</button>
+    <button @click="saveMoves()">Save</button>
+    <button @click="getPosition()">Get Current Position</button>
+    <button @click="deleteDatabase()">Delete Database</button>
+    <button @click="getAllMoves()">Get All Moves</button>
+    <button @click="getAllPositions()">Get All Positions</button>
+  </div>
+</template>
+
 <script lang="ts">
+import Header from "../components/Header.vue";
 import {
   computed,
   defineComponent,
@@ -8,10 +45,10 @@ import {
   ref,
   watchEffect
 } from "vue";
-import GoBoard from "./GoBoard.vue";
+import GoBoard from "../components/GoBoard.vue";
 import Board, { Vertex } from "@sabaki/go-board";
 import type { MoveList, Move } from "../types";
-import MoveDisplay from "./MoveDisplay.vue";
+import MoveDisplay from "../components/MoveDisplay.vue";
 
 import { Matrix } from "@/utils";
 import { PositionApi, MoveApi, DatabaseApi } from "@/api";
@@ -19,7 +56,7 @@ import { Player } from "@/db/types";
 
 export default defineComponent({
   name: "HomePage",
-  components: { GoBoard, MoveDisplay },
+  components: { GoBoard, MoveDisplay, Header },
   setup() {
     const rows = ref(19);
     const columns = ref(19);
@@ -188,41 +225,6 @@ export default defineComponent({
   }
 });
 </script>
-
-<template>
-  <div class="main" @keyup.up="previousMove" @keyup.down="nextMove">
-    <MoveDisplay
-      :moves="moveList"
-      :turn="turn"
-      :board-height="board.height"
-      @mouseenter="setHoveredBoard"
-      @mouseleave:all="setHoveredBoard(null)"
-      @click="jumpToPosition"
-    />
-    <GoBoard
-      v-model:player="player"
-      v-model:moveList="moveList"
-      v-model:turn="turn"
-      width="75%"
-      :board="displayBoard"
-      show-coordinates
-      :ghost-stones="ghostStones"
-      @update:board="(val) => (board = val)"
-    />
-    <button @click="transform(Transformation.rot90)">Rotate 90</button>
-    <button @click="transform(Transformation.rot180)">Rotate 180</button>
-    <button @click="transform(Transformation.rot270)">Rotate 270</button>
-    <button @click="transform(Transformation.mirror)">Mirror</button>
-    <button @click="transform(Transformation.mirrorRot90)">Mirror 90</button>
-    <button @click="transform(Transformation.mirrorRot180)">Mirror 180</button>
-    <button @click="transform(Transformation.mirrorRot270)">Mirror 270</button>
-    <button @click="saveMoves()">Save</button>
-    <button @click="getPosition()">Get Current Position</button>
-    <button @click="deleteDatabase()">Delete Database</button>
-    <button @click="getAllMoves()">Get All Moves</button>
-    <button @click="getAllPositions()">Get All Positions</button>
-  </div>
-</template>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>

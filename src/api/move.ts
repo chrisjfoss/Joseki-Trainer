@@ -1,5 +1,6 @@
 import { Player, Position } from "@/db/types";
 import { getAppliedTransformation, Matrix } from "@/utils";
+import { getCurrentSession } from "@/utils/leitner";
 import { getVerticeTransformation } from "@/utils/matrixUtil";
 import GoBoard, { Vertex } from "@sabaki/go-board";
 import type { IndexableType } from "dexie";
@@ -12,6 +13,17 @@ import {
 
 export const getAllMoves = async () => {
   return db.moves.toArray();
+};
+
+export const getMovesForCurrentSession = async () => {
+  return await db.moves
+    .where("deck")
+    .equals(10)
+    .or("deck")
+    .equals(getCurrentSession())
+    .or("nextSessionTimestamp")
+    .above(new Date().getTime())
+    .toArray();
 };
 
 export const getMovesByPositionId = async (positionId: IndexableType) => {
@@ -85,6 +97,13 @@ const addMove = async (
     },
     positionId,
     previousPositionId: previousPositionId ?? 0,
-    comments: ""
+    comments: "",
+
+    // 10 is the "Current deck"
+    deck: 10,
+    nextSessionTimestamp: new Date().getTime(),
+
+    numberOfAttempts: 0,
+    numberOfSuccesses: 0
   });
 };

@@ -23,6 +23,22 @@ export const getSessionForDate = (date: Date) => {
   return Math.floor((timestamp + 1 / (60000 * 60 * 24)) % 10);
 };
 
+export const isFinalSession = (deck: number) => {
+  const sessions = getSessionsForDeck(deck);
+  return sessions[sessions.length - 1] === getCurrentSession();
+};
+
+export const getNewDeck = (success: boolean, prevDeck: number) => {
+  if (!success) {
+    return 10;
+  }
+  const session = getCurrentSession();
+  if (isFinalSession(prevDeck)) {
+    return 11;
+  }
+  return session;
+};
+
 /**
  * Decks:
  * 0: 0259
