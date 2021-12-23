@@ -43,7 +43,13 @@ export default defineComponent({
       default: () => []
     }
   },
-  emits: ["update:player", "update:board", "update:moveList", "update:turn"],
+  emits: [
+    "update:player",
+    "update:board",
+    "update:moveList",
+    "update:turn",
+    "check-move"
+  ],
   setup(props, context) {
     const widthNumericPart = props.width.toString().replace(/[^0-9]/g, "");
     const widthUnitPart = props.width.toString().replace(/[0-9]/g, "");
@@ -101,6 +107,7 @@ export default defineComponent({
         context.emit("update:board", board);
         context.emit("update:player", props.player * -1);
         context.emit("update:turn", props.turn + 1);
+        context.emit("check-move", { move: vertex, board });
 
         const moveList = [
           ...props.moveList.slice(0, props.turn + 1),

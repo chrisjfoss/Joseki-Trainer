@@ -20,6 +20,10 @@ export default defineComponent({
       type: Number,
       required: true
     },
+    maxHeight: {
+      type: [Number, String],
+      required: true
+    }
   },
   emits: ["mouseenter", "mouseleave", "click", "mouseleave:all"],
   setup(props, context) {
@@ -58,7 +62,7 @@ export default defineComponent({
 });
 </script>
 <template>
-  <div @mouseleave="emitMouseLeaveAll">
+  <div :style="{ 'max-height': maxHeight }" @mouseleave="emitMouseLeaveAll">
     <ul class="move-list">
       <span v-for="(move, i) in filteredMoves" :key="i">
         <li v-if="move.priorMove" class="move">
@@ -86,17 +90,20 @@ export default defineComponent({
 <style lang="scss">
 .move-list {
   list-style: none;
-  padding: 0;
+  padding: 1.5rem;
   margin: 0;
   display: grid;
   grid-template-columns: repeat(2, max-content);
   row-gap: 0.5rem;
   column-gap: 1rem;
-  border: 1px solid #ccc;
-  background-color: #aaa;
-  color: #ddd;
+  background-color: var(--primary);
   margin: auto;
+  height: 100%;
+  color: var(--text);
+  align-content: baseline;
+  overflow-y: auto;
 }
+
 .move {
   display: grid;
   grid-template-columns: max-content 1fr 1fr;
@@ -104,14 +111,18 @@ export default defineComponent({
   justify-content: start;
   text-align: start;
   position: relative;
+  cursor: pointer;
   width: 100%;
+
   .turn:hover {
-    background-color: black;
-    opacity: 0.1;
+    background-color: var(--text);
+    color: var(--background);
+    opacity: 0.2;
   }
 }
 .current {
-  background-color: black;
-  opacity: 0.2;
+  background-color: var(--text);
+  color: var(--background);
+  opacity: 0.4;
 }
 </style>

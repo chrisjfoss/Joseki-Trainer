@@ -1,10 +1,10 @@
 <template>
-  <Header />
   <div class="main" @keyup.up="previousMove" @keyup.down="nextMove">
     <MoveDisplay
       :moves="moveList"
       :turn="turn"
       :board-height="board.height"
+      :max-height="`${targetWidth}px`"
       @mouseenter="setHoveredBoard"
       @mouseleave:all="setHoveredBoard(null)"
       @click="jumpToPosition"
@@ -13,7 +13,8 @@
       v-model:player="player"
       v-model:moveList="moveList"
       v-model:turn="turn"
-      width="75%"
+      class="board"
+      :width="`${targetWidth}px`"
       :board="displayBoard"
       show-coordinates
       :ghost-stones="ghostStones"
@@ -35,7 +36,6 @@
 </template>
 
 <script lang="ts">
-import Header from "../components/Header.vue";
 import {
   computed,
   defineComponent,
@@ -56,7 +56,7 @@ import { Player } from "@/db/types";
 
 export default defineComponent({
   name: "HomePage",
-  components: { GoBoard, MoveDisplay, Header },
+  components: { GoBoard, MoveDisplay },
   setup() {
     const rows = ref(19);
     const columns = ref(19);
@@ -75,6 +75,18 @@ export default defineComponent({
 
     const displayBoard = computed(() => {
       return hoveredBoard.value ?? board.value;
+    });
+
+    const windowHeight = ref(window.innerHeight);
+    const windowWidth = ref(window.innerWidth);
+
+    window.onresize = () => {
+      windowHeight.value = window.innerHeight;
+      windowWidth.value = window.innerWidth;
+    };
+
+    const targetWidth = computed(() => {
+      return Math.min(windowWidth.value - 200, windowHeight.value - 200);
     });
 
     const ghostStones = ref(
@@ -220,7 +232,8 @@ export default defineComponent({
       deleteDatabase,
       getAllMoves,
       getAllPositions,
-      ghostStones
+      ghostStones,
+      targetWidth
     };
   }
 });
@@ -228,22 +241,11 @@ export default defineComponent({
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-h3 {
-  margin: 40px 0 0;
-}
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-li {
-  display: inline-block;
-  margin: 0 10px;
-}
-a {
-  color: #42b983;
-}
 .main {
   display: grid;
-  grid-template-columns: 10rem 1fr;
+  grid-template-columns: 23rem 1fr;
+}
+.board {
+  justify-self: center;
 }
 </style>

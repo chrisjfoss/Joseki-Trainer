@@ -7,14 +7,9 @@ export default defineComponent({
 </script>
 <template>
   <div class="header">
-    <h1>
-      <router-link to="/">
-        <img src="" alt="Go logo" />
-      </router-link>
-    </h1>
     <div class="nav">
       <router-link to="/">Home</router-link>
-      <router-link to="/train">About</router-link>
+      <router-link to="/train">Train</router-link>
     </div>
   </div>
 </template>
@@ -23,8 +18,8 @@ export default defineComponent({
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0.5rem 1rem;
-  background-color: blue;
+  padding: 1rem;
+  background-color: var(--primary);
 }
 .header h1 {
   font-size: 1.5rem;
@@ -38,6 +33,6 @@ export default defineComponent({
 .header .nav a {
   margin-left: 1rem;
   text-decoration: none;
-  color: #333;
+  color: var(--text);
 }
 </style>
