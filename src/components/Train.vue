@@ -23,7 +23,7 @@ export default defineComponent({
       default: () => []
     },
     acceptedMove: {
-      type: [] as PropType<Vertex>,
+      type: Object as PropType<Vertex>,
       required: true
     },
     board: {
@@ -47,6 +47,9 @@ export default defineComponent({
   emits: ["solved-position", "update:player", "update:turn", "update:moveList"],
   setup(props, context) {
     const checkMove = ({ move, board }: { move: Vertex; board: Board }) => {
+      console.log("Board: ", board);
+      console.log("Ghost Stones: ", ghostStones.value);
+
       console.log("Vertex: ", move);
       console.log("Accepted Move: ", props.acceptedMove);
       if (

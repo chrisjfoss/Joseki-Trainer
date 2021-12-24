@@ -1,6 +1,7 @@
 import Board, { Sign, Vertex } from "@sabaki/go-board";
 import * as Matrix from "./matrixUtil";
 import * as Leitner from "./leitner";
+import * as BoardUtil from "./board";
 
 class SingletonUtilStorage {
   public static storedBoard: Board;
@@ -8,15 +9,15 @@ class SingletonUtilStorage {
     keyof Matrix.TransformationCollection<Sign>,
     string
   > = {
-    original: "",
-    rot90: "",
-    rot180: "",
-    rot270: "",
-    mirror: "",
-    mirrorRot90: "",
-    mirrorRot180: "",
-    mirrorRot270: ""
-  };
+      original: "",
+      rot90: "",
+      rot180: "",
+      rot270: "",
+      mirror: "",
+      mirrorRot90: "",
+      mirrorRot180: "",
+      mirrorRot270: ""
+    };
 }
 
 const getPositionString = (position: Sign[][]) => {
@@ -158,7 +159,7 @@ const getAppliedTransformation = (
   for (let i = 0; i < keys.length; i++) {
     if (
       positionStrings[
-        keys[i] as keyof Matrix.TransformationCollection<Sign>
+      keys[i] as keyof Matrix.TransformationCollection<Sign>
       ] === transformedPositionString
     ) {
       return Matrix.Transformation[keys[i]];
@@ -194,6 +195,7 @@ const getPositionStringForTransformation = (
 export {
   Matrix,
   Leitner,
+  BoardUtil,
   getPositionString,
   getAllPositionStrings,
   getPositionStringForTransformation,

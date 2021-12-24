@@ -1,4 +1,3 @@
-import { BoardApi } from "@/api";
 import { Vertex } from "@/components/GoBoard/ShudanPort/types";
 import { Position } from "@/db/types";
 import GoBoard, { Sign, SignMap } from "@sabaki/go-board";
@@ -26,11 +25,11 @@ export const getSignMapFromPosition = (
   width: number,
   height: number
 ): SignMap => {
-  const signMap: SignMap = [];
+  const signMap: SignMap = []
   for (let i = 0; i < width; i++) {
     signMap.push([] as Sign[]);
     for (let j = 0; j < height; j++) {
-      const sign = (Number.parseInt(position.position[i][j]) - 1) as Sign;
+      const sign = (Number.parseInt(position.position[i * width + j]) - 1) as Sign;
       signMap[i].push(sign);
     }
   }
