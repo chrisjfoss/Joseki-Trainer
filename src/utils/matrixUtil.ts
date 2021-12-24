@@ -73,7 +73,7 @@ export const getTransformation = <T>(
 ): T[][] => {
   const transformedArray: T[][] = [];
   for (let i = 0; i < array.length; i++) {
-    transformedArray[i] = [];
+    transformedArray[i] = new Array(array[i].length).fill(0);
     for (let j = 0; j < array[i].length; j++) {
       switch (transformation) {
         case Transformation.original:

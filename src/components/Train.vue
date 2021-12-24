@@ -1,10 +1,12 @@
 <script lang="ts">
 import { computed, PropType, ref } from "vue";
 import { defineComponent } from "@vue/runtime-core";
-import Board, { Vertex } from "@sabaki/go-board";
+import Board from "@sabaki/go-board";
 import GoBoard from "./GoBoard.vue";
 import { MoveList } from "@/types";
 import { Training } from "@/constants";
+import { Position } from "@/db/types";
+import { BoardUtil } from "@/utils";
 
 export default defineComponent({
   name: "Train",
@@ -17,13 +19,13 @@ export default defineComponent({
       required: false,
       default: "100%"
     },
-    candidateMoves: {
-      type: Array as PropType<Vertex[]>,
+    candidatePositions: {
+      type: Array as PropType<Position[]>,
       required: false,
       default: () => []
     },
-    acceptedMove: {
-      type: Object as PropType<Vertex>,
+    acceptedPosition: {
+      type: Object as PropType<Position>,
       required: true
     },
     board: {
@@ -46,28 +48,39 @@ export default defineComponent({
   },
   emits: ["solved-position", "update:player", "update:turn", "update:moveList"],
   setup(props, context) {
-    const checkMove = ({ move, board }: { move: Vertex; board: Board }) => {
-      console.log("Board: ", board);
-      console.log("Ghost Stones: ", ghostStones.value);
+    const acceptedBoard = computed(() => {
+      return BoardUtil.getBoardFromPosition(props.acceptedPosition, props.board.width, props.board.height);
+    });
 
-      console.log("Vertex: ", move);
-      console.log("Accepted Move: ", props.acceptedMove);
+    const candidateBoards = computed(() => {
+      return props.candidatePositions.map(position => {
+        return BoardUtil.getBoardFromPosition(position, props.board.width, props.board.height);
+      });
+    });
+
+    const checkMove = ({ board }: { board: Board }) => {
+      const madeAcceptedMove = BoardUtil.areEqualWithTransformation(acceptedBoard.value, board);
+      const madeCandidateMove = candidateBoards.value.map(
+        (candidateBoard) => ({
+          board: candidateBoard,
+          ...BoardUtil.areEqualWithTransformation(candidateBoard, board)
+        })
+      ).filter(candidateInfo => candidateInfo.equal);
       if (
-        move[0] === props.acceptedMove[0] &&
-        move[1] === props.acceptedMove[1]
+        madeAcceptedMove.equal
       ) {
         context.emit("solved-position", {
           result: Training.Result.solved,
-          board
+          board,
+          transformation: madeAcceptedMove.transformation
         });
       } else if (
-        props.candidateMoves.some(
-          (candidate) => candidate[0] === move[0] && candidate[1] === move[1]
-        )
+        madeCandidateMove.length > 0
       ) {
         context.emit("solved-position", {
           result: Training.Result.alternate,
-          board
+          board,
+          transformation: madeCandidateMove[0].transformation
         });
       } else {
         context.emit("solved-position", {

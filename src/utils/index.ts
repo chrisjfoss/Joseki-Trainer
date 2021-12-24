@@ -2,6 +2,7 @@ import Board, { Sign, Vertex } from "@sabaki/go-board";
 import * as Matrix from "./matrixUtil";
 import * as Leitner from "./leitner";
 import * as BoardUtil from "./board";
+import * as PositionUtil from "./position";
 
 class SingletonUtilStorage {
   public static storedBoard: Board;
@@ -19,6 +20,12 @@ class SingletonUtilStorage {
       mirrorRot270: ""
     };
 }
+
+export const getRandomTransformation = () => {
+  // Get random transformation from Matrix.Transformation enum
+  const transformation = Math.floor(Math.random() * Object.keys(Matrix.Transformation).length / 2) as Matrix.Transformation;
+  return transformation;
+};
 
 const getPositionString = (position: Sign[][]) => {
   return position.reduce((accumulator, currentRow) => {
@@ -134,6 +141,7 @@ const relativeTransformations = {
     [Matrix.Transformation.mirrorRot270]: Matrix.Transformation.original
   }
 };
+
 export const getRelativeTransformation = (
   initialTransformation: Matrix.Transformation,
   finalTransformation: Matrix.Transformation
@@ -180,7 +188,7 @@ const getAllPositionStrings = (board: Board) => {
     });
     SingletonUtilStorage.storedBoard = board;
   }
-  return SingletonUtilStorage.storedPositionStrings;
+  return { ...SingletonUtilStorage.storedPositionStrings };
 };
 
 const getPositionStringForTransformation = (
@@ -196,6 +204,7 @@ export {
   Matrix,
   Leitner,
   BoardUtil,
+  PositionUtil,
   getPositionString,
   getAllPositionStrings,
   getPositionStringForTransformation,

@@ -20,8 +20,15 @@ export const getAllPositions = async () => {
   return await db.positions.toArray();
 };
 
-export const getPositionById = async (id: IndexableType) => {
-  return await db.positions.get(id);
+export const getPositionById = async (id: IndexableType, includeCandidateMoves?: boolean) => {
+  const position = await db.positions.get(id);
+  if (position && includeCandidateMoves) {
+    // Get all moves for the position
+    position.candidateMoves = await MoveApi.getMovesByPositionId(
+      position.id as IndexableType
+    );
+  }
+  return position;
 };
 
 export const getOriginalPositionFromBoard = async (

@@ -1,6 +1,9 @@
 import { Vertex } from "@/components/GoBoard/ShudanPort/types";
 import { Position } from "@/db/types";
 import GoBoard, { Sign, SignMap } from "@sabaki/go-board";
+import _ from "lodash";
+import { getAllPositionStrings, getRelativeTransformation, Matrix } from ".";
+
 
 interface GoBoardWithKo extends GoBoard {
   _koInfo: { sign: Sign; vertex: Vertex };
@@ -34,4 +37,51 @@ export const getSignMapFromPosition = (
     }
   }
   return signMap;
+};
+
+export const applyRandomTransformation = (board: GoBoard) => {
+  // Get random enum from Matrix.Transformation
+  const randomTransformation = Math.floor(Math.random() * Object.keys(Matrix.Transformation).length / 2) as Matrix.Transformation;;
+
+  return applyTransformation(board, randomTransformation);
+}
+
+export const applyTransformation = (board: GoBoard, transformation: Matrix.Transformation) => {
+  const newBoard = _.cloneDeep(board) as GoBoardWithKo;
+
+  // Get new signMap
+  newBoard.signMap = Matrix.getTransformation(transformation, board.signMap);
+
+  // Apply transform to ko
+  newBoard._koInfo.vertex = Matrix.getVerticeTransformation(newBoard._koInfo.vertex, transformation, board.width, board.height);
+  newBoard.height = newBoard.signMap.length;
+  newBoard.width = newBoard.signMap[0].length;
+  return newBoard;
+}
+
+export const areEqualWithTransformation = (a: GoBoard, b: GoBoard) => {
+  const getATransformations = getAllPositionStrings(a);
+  const getBTransformations = getAllPositionStrings(b);
+  const aTransformationKeys = Object.keys(getATransformations) as (keyof typeof Matrix.Transformation)[];
+  const bTransformationKeys = Object.keys(getBTransformations) as (keyof typeof Matrix.Transformation)[];
+
+  for (let i = 0; i < aTransformationKeys.length; i++) {
+    const aKey = aTransformationKeys[i];
+    for (let j = 0; j < bTransformationKeys.length; j++) {
+      const bKey = bTransformationKeys[j];
+      if (getATransformations[aKey] === getBTransformations[bKey]) {
+        return {
+          equal: true,
+          transformation: getRelativeTransformation(
+            Matrix.Transformation[aKey as keyof typeof Matrix.Transformation],
+            Matrix.Transformation[bKey as keyof typeof Matrix.Transformation]
+          ),
+        };
+      }
+    }
+  }
+  return {
+    equal: false,
+    transformation: Matrix.Transformation.original,
+  }
 };

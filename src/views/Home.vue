@@ -50,7 +50,7 @@ import Board, { Vertex } from "@sabaki/go-board";
 import type { MoveList, Move } from "../types";
 import MoveDisplay from "../components/MoveDisplay.vue";
 
-import { Matrix } from "@/utils";
+import { BoardUtil, Matrix } from "@/utils";
 import { PositionApi, MoveApi, DatabaseApi } from "@/api";
 import { Player } from "@/db/types";
 
@@ -185,11 +185,12 @@ export default defineComponent({
     };
 
     const transform = (transformation: Matrix.Transformation) => {
+      board.value = BoardUtil.applyTransformation(board.value, transformation);
       for (let i = 0; i < moveList.value.length; ++i) {
         const newMoveList = [...moveList.value];
-        newMoveList[i].board.signMap = Matrix.getTransformation(
+        newMoveList[i].board = BoardUtil.applyTransformation(
+          newMoveList[i].board,
           transformation,
-          newMoveList[i].board.signMap
         );
         if (newMoveList[i].priorMove) {
           newMoveList[i].priorMove = Matrix.getVerticeTransformation(
