@@ -1,5 +1,6 @@
+import { Training } from "@/constants";
 import { Player, Position } from "@/db/types";
-import { getAppliedTransformation, Matrix } from "@/utils";
+import { getAppliedTransformation, Leitner, Matrix } from "@/utils";
 import { getCurrentSession } from "@/utils/leitner";
 import { getVerticeTransformation } from "@/utils/matrixUtil";
 import GoBoard, { Vertex } from "@sabaki/go-board";
@@ -15,14 +16,43 @@ export const getAllMoves = async () => {
   return db.moves.toArray();
 };
 
+export const getMoveCountBySessionDate = async () => {
+  const moves = await db.moves.toArray();
+  const movesBySessionDate = new Map<number, number>();
+  moves.forEach(move => {
+    const today = new Date();
+    today.setUTCHours(0, 0, 0, 0);
+    const currentTimestamp = today.getTime();
+
+    if (move.nextSessionTimestamp <= currentTimestamp) {
+      const currentCount = movesBySessionDate.get(currentTimestamp) ?? 0;
+      movesBySessionDate.set(
+        currentTimestamp,
+        currentCount + 1
+      );
+    }
+    else {
+      const currentCount = movesBySessionDate.get(move.nextSessionTimestamp) ?? 0
+      movesBySessionDate.set(
+        move.nextSessionTimestamp,
+        currentCount + 1
+      );
+    }
+  })
+  return movesBySessionDate;
+}
+
 export const getMovesForCurrentSession = async () => {
   return await db.moves
     .where("deck")
     .equals(10)
     .or("deck")
     .equals(getCurrentSession())
-    .or("nextSessionTimestamp")
-    .above(new Date().getTime())
+    .filter(move => {
+      const filterDate = new Date();
+      filterDate.setUTCHours(0, 0, 0, 0);
+      return move.deck === 10 || move.nextSessionTimestamp <= filterDate.getTime();
+    })
     .toArray();
 };
 
@@ -33,6 +63,38 @@ export const getMovesByPositionId = async (positionId: IndexableType) => {
     .equals(positionId)
     .toArray();
 };
+
+export const trainedMove = async (
+  moveId: number,
+  result: Training.Result,
+) => {
+  if (result === Training.Result.alternate) {
+    return;
+  }
+  const move = await db.moves.get(moveId);
+  if (!move) {
+    throw new Error(`Move with id ${moveId} not found`);
+  }
+  const currentDeck = move.deck;
+  const success = result === Training.Result.solved;
+  move.deck = Leitner.getNewDeck(success, currentDeck);
+  move.nextSessionTimestamp = Leitner.getNextDateForDeck(move.deck).getTime();
+  move.numberOfAttempts += 1;
+  if (success) move.numberOfSuccesses += 1;
+  await db.moves.put(move);
+}
+
+export const updateMoveComment = async (
+  moveId: number,
+  comment: string,
+) => {
+  const move = await db.moves.get(moveId);
+  if (!move) {
+    throw new Error(`Move with id ${moveId} not found`);
+  }
+  move.comments = comment;
+  await db.moves.put(move);
+}
 
 export const saveMove = async (
   vertex: Vertex,
@@ -90,6 +152,8 @@ const addMove = async (
   positionId: IndexableType,
   previousPositionId?: IndexableType
 ) => {
+  const nextSessionDate = new Date();
+  nextSessionDate.setUTCHours(0, 0, 0, 0);
   return await db.moves.add({
     point: {
       x: point[0],
@@ -101,7 +165,7 @@ const addMove = async (
 
     // 10 is the "Current deck"
     deck: 10,
-    nextSessionTimestamp: new Date().getTime(),
+    nextSessionTimestamp: nextSessionDate.getTime(),
 
     numberOfAttempts: 0,
     numberOfSuccesses: 0

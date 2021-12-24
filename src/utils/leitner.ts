@@ -23,6 +23,27 @@ export const getSessionForDate = (date: Date) => {
   return Math.floor((timestamp + 1 / (60000 * 60 * 24)) % 10);
 };
 
+export const getNextDateForDeck = (deck: number) => {
+  const sessions = getSessionsForDeck(deck);
+
+  const proposedDate = new Date();
+  proposedDate.setUTCHours(0, 0, 0, 0);
+  if (deck === 10) {
+    return proposedDate;
+  } else if (deck === 11) {
+    proposedDate.setFullYear(proposedDate.getFullYear() + 1);
+    return proposedDate;
+  }
+
+  proposedDate.setDate(proposedDate.getDate() + 1);
+  let i = 0;
+  while (!sessions.includes(getSessionForDate(proposedDate)) && i <= 10) {
+    proposedDate.setDate(proposedDate.getDate() + 1);
+    ++i;
+  }
+  return proposedDate;
+}
+
 export const isFinalSession = (deck: number) => {
   const sessions = getSessionsForDeck(deck);
   return sessions[sessions.length - 1] === getCurrentSession();

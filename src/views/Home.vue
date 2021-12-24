@@ -20,6 +20,7 @@
       :ghost-stones="ghostStones"
       @update:board="(val) => (board = val)"
     />
+    <Schedule />
     <button @click="transform(Transformation.rot90)">Rotate 90</button>
     <button @click="transform(Transformation.rot180)">Rotate 180</button>
     <button @click="transform(Transformation.rot270)">Rotate 270</button>
@@ -53,10 +54,11 @@ import MoveDisplay from "../components/MoveDisplay.vue";
 import { BoardUtil, Matrix } from "@/utils";
 import { PositionApi, MoveApi, DatabaseApi } from "@/api";
 import { Player } from "@/db/types";
+import Schedule from "../components/Schedule.vue";
 
 export default defineComponent({
   name: "HomePage",
-  components: { GoBoard, MoveDisplay },
+  components: { GoBoard, MoveDisplay, Schedule },
   setup() {
     const rows = ref(19);
     const columns = ref(19);

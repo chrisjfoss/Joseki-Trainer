@@ -115,6 +115,9 @@ export default defineComponent({
       board: Board;
       transformation: Matrix.Transformation;
     }) => {
+      if (currentMove.value.id) {
+        MoveApi.trainedMove(currentMove.value.id, result);
+      }
       if (result === Training.Result.solved) {
         movesToTrain.value = movesToTrain.value.slice(1, movesToTrain.value.length);
         currentTransformation.value = transformation;
