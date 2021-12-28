@@ -14,6 +14,7 @@
   "main": "background.js",
   "dependencies": {
     "@juggle/resize-observer": "^3.3.1",
+    "@popperjs/core": "^2.11.0",
     "@sabaki/go-board": "^1.4.3",
     "@types/lodash": "^4.14.177",
     "classnames": "^2.3.1",
@@ -22,6 +23,7 @@
     "lodash": "^4.17.21",
     "node-sass": "^7.0.0",
     "sass": "^1.43.4",
+    "v-calendar": "^3.0.0-alpha.6",
     "vue": "^3.0.0",
     "vue-router": "4"
   },
