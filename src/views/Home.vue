@@ -192,7 +192,7 @@ export default defineComponent({
         const newMoveList = [...moveList.value];
         newMoveList[i].board = BoardUtil.applyTransformation(
           newMoveList[i].board,
-          transformation,
+          transformation
         );
         if (newMoveList[i].priorMove) {
           newMoveList[i].priorMove = Matrix.getVerticeTransformation(

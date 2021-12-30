@@ -1,7 +1,9 @@
 <template>
-  <div class="container theme-light">
-    <TheHeader />
-    <router-view></router-view>
+  <div class="theme-container theme-light">
+    <div class="container">
+      <TheHeader />
+      <router-view></router-view>
+    </div>
   </div>
 </template>
 
@@ -23,7 +25,8 @@ export default defineComponent({
   gap: 1rem;
 }
 
-body {
+#app .theme-container {
   background-color: var(--background);
+  min-height: 100vh;
 }
 </style>

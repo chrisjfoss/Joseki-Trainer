@@ -1,20 +1,26 @@
 <template>
   <div id="schedule" class="schedule">
     <v-calendar :masks="{ weekdays: 'WWW' }" :attributes="calendarAttrs">
-      <template #day-content="{ day, attributes }">
+      <template #day-popover="{ day, attributes }">
         <div class="schedule__day">
-          <div class="schedule__label">{{ day.day }}</div>
+          <div class="schedule__label">{{ day.id }}</div>
           <div class="schedule__data">
-            <p class="schedule__text">{{ attributes.customData.title }}</p>
+            <p
+              v-for="attribute in attributes"
+              :key="attribute.key"
+              class="schedule__text"
+            >
+              {{ attribute.customData.title }}
+            </p>
           </div>
         </div>
       </template>
     </v-calendar>
   </div>
 </template>
-<script lang="ts">import { MoveApi } from "@/api";
+<script lang="ts">
+import { MoveApi } from "@/api";
 import { computed, defineComponent, onMounted, ref } from "vue";
-
 
 export default defineComponent({
   name: "Schedule",
@@ -25,7 +31,6 @@ export default defineComponent({
       console.log(moveCountBySessionDate.value);
     });
 
-
     const calendarAttrs = computed(() => {
       const returnAttrs = [];
       let i = 0;
@@ -33,19 +38,27 @@ export default defineComponent({
         returnAttrs.push({
           key: i,
           customData: {
-            title: `${count} moves`,
+            title: `${count} moves to review`
           },
-          dates: new Date(date),
-        })
+          dot: {
+            class: "primary"
+          },
+          popover: {
+            visibility: "hover",
+            hideIndicator: false
+          },
+          dates: new Date(date)
+        });
         ++i;
       }
+      console.log("returnAttrs", returnAttrs);
       return returnAttrs;
     });
     return {
       calendarAttrs
     };
   }
-})
+});
 </script>
 <style lang="scss">
 .schedule {
