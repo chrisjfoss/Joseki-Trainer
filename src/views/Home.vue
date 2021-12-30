@@ -1,14 +1,20 @@
 <template>
   <div class="main" @keyup.up="previousMove" @keyup.down="nextMove">
-    <MoveDisplay
-      :moves="moveList"
-      :turn="turn"
-      :board-height="board.height"
-      :max-height="`${targetWidth}px`"
-      @mouseenter="setHoveredBoard"
-      @mouseleave:all="setHoveredBoard(null)"
-      @click="jumpToPosition"
-    />
+    <div class="main__sidebar">
+      <MoveDisplay
+        :moves="moveList"
+        :turn="turn"
+        :board-height="board.height"
+        :max-height="`${targetWidth}px`"
+        @mouseenter="setHoveredBoard"
+        @mouseleave:all="setHoveredBoard(null)"
+        @click="jumpToPosition"
+      />
+      <CandidateMoveDisplay
+        :position="dbPosition ?? undefined"
+        :dimensions="{ rows: board.height, columns: board.width }"
+      />
+    </div>
     <GoBoard
       v-model:player="player"
       v-model:moveList="moveList"
@@ -20,19 +26,17 @@
       :ghost-stones="ghostStones"
       @update:board="(val) => (board = val)"
     />
-    <Schedule />
-    <button @click="transform(Transformation.rot90)">Rotate 90</button>
-    <button @click="transform(Transformation.rot180)">Rotate 180</button>
-    <button @click="transform(Transformation.rot270)">Rotate 270</button>
-    <button @click="transform(Transformation.mirror)">Mirror</button>
-    <button @click="transform(Transformation.mirrorRot90)">Mirror 90</button>
-    <button @click="transform(Transformation.mirrorRot180)">Mirror 180</button>
-    <button @click="transform(Transformation.mirrorRot270)">Mirror 270</button>
     <button @click="saveMoves()">Save</button>
     <button @click="getPosition()">Get Current Position</button>
     <button @click="deleteDatabase()">Delete Database</button>
+    <button @click="getAvailableDatabases()">Get Available Databases</button>
     <button @click="getAllMoves()">Get All Moves</button>
     <button @click="getAllPositions()">Get All Positions</button>
+    <input v-model="dbName" type="text" />
+    <button @click="createDatabase()">Create Database</button>
+    <select v-model="currentDatabase">
+      <option v-for="db in databases" :key="db" :value="db">{{ db }}</option>
+    </select>
   </div>
 </template>
 
@@ -44,21 +48,21 @@ import {
   onMounted,
   Ref,
   ref,
+  watch,
   watchEffect
 } from "vue";
 import GoBoard from "../components/GoBoard.vue";
-import Board, { Vertex } from "@sabaki/go-board";
+import Board from "@sabaki/go-board";
 import type { MoveList, Move } from "../types";
 import MoveDisplay from "../components/MoveDisplay.vue";
 
-import { BoardUtil, Matrix } from "@/utils";
 import { PositionApi, MoveApi, DatabaseApi } from "@/api";
-import { Player } from "@/db/types";
-import Schedule from "../components/Schedule.vue";
+import { Player, Position } from "@/db/types";
+import CandidateMoveDisplay from "@/components/CandidateMoveDisplay.vue";
 
 export default defineComponent({
   name: "HomePage",
-  components: { GoBoard, MoveDisplay, Schedule },
+  components: { GoBoard, MoveDisplay, CandidateMoveDisplay },
   setup() {
     const rows = ref(19);
     const columns = ref(19);
@@ -97,16 +101,20 @@ export default defineComponent({
         .map(() => Array(columns.value).fill(null))
     );
 
-    watchEffect(async () => {
-      const dbPosition = await PositionApi.getPositionFromBoard(
-        displayBoard.value,
-        player.value
-      );
+    const dbPosition: Ref<Position | null> = ref(null);
+    const dbName = ref("");
+
+    const setGhostStones = async () => {
+      dbPosition.value =
+        (await PositionApi.getPositionFromBoard(
+          displayBoard.value,
+          player.value
+        )) ?? null;
       const newGhostStones = Array(rows.value)
         .fill(null)
         .map(() => Array(columns.value).fill(null));
-      if (dbPosition) {
-        dbPosition.candidateMoves.forEach((move) => {
+      if (dbPosition.value) {
+        dbPosition.value.candidateMoves.forEach((move) => {
           newGhostStones[move.point.y][move.point.x] = {
             sign: player.value,
             type: "interesting",
@@ -115,6 +123,13 @@ export default defineComponent({
         });
       }
       ghostStones.value = newGhostStones;
+    };
+
+    watchEffect(setGhostStones);
+    const currentDatabase = ref("default");
+    watch(currentDatabase, async () => {
+      await DatabaseApi.switchToDatabase(currentDatabase.value);
+      await setGhostStones();
     });
 
     const saveMoves = async () => {
@@ -186,30 +201,27 @@ export default defineComponent({
       }
     };
 
-    const transform = (transformation: Matrix.Transformation) => {
-      board.value = BoardUtil.applyTransformation(board.value, transformation);
-      for (let i = 0; i < moveList.value.length; ++i) {
-        const newMoveList = [...moveList.value];
-        newMoveList[i].board = BoardUtil.applyTransformation(
-          newMoveList[i].board,
-          transformation
-        );
-        if (newMoveList[i].priorMove) {
-          newMoveList[i].priorMove = Matrix.getVerticeTransformation(
-            newMoveList[i].priorMove as Vertex,
-            transformation,
-            newMoveList[i].board.width,
-            newMoveList[i].board.height
-          );
-        }
-        moveList.value = newMoveList;
-      }
-    };
-
     const deleteDatabase = async () => {
       await DatabaseApi.deleteDatabase();
     };
 
+    const getAvailableDatabases = async () => {
+      const databases = await DatabaseApi.getAvailableDatabases();
+      console.log(databases);
+    };
+
+    const createDatabase = async () => {
+      await DatabaseApi.createDatabase(dbName.value);
+      await updateDatabaseList();
+    };
+
+    const databases = ref([] as string[]);
+    const updateDatabaseList = async () => {
+      databases.value = await DatabaseApi.getAvailableDatabases();
+    };
+    onMounted(async () => {
+      updateDatabaseList();
+    });
     onMounted(() => {
       window.addEventListener("keydown", cycleMove);
     });
@@ -228,25 +240,35 @@ export default defineComponent({
       turn,
       previousMove,
       nextMove,
-      Transformation: Matrix.Transformation,
-      transform,
       saveMoves,
       getPosition,
       deleteDatabase,
+      getAvailableDatabases,
       getAllMoves,
       getAllPositions,
       ghostStones,
-      targetWidth
+      targetWidth,
+      dbPosition,
+      dbName,
+      createDatabase,
+      databases,
+      currentDatabase
     };
   }
 });
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
+<style scoped lang="scss">
 .main {
+  margin: 0 1rem;
   display: grid;
   grid-template-columns: 23rem 1fr;
+  &__sidebar {
+    display: grid;
+    grid-template-rows: minmax(250px, 1fr) minmax(250px, min-content);
+    row-gap: 1rem;
+  }
 }
 .board {
   justify-self: center;

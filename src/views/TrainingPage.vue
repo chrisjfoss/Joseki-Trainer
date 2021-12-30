@@ -1,16 +1,17 @@
 <template>
   <div id="train-page">
-    <Train
-      v-if="acceptedPosition"
-      v-model:player="player"
-      v-model:moveList="moveList"
-      v-model:turn="turn"
-      :board="board"
-      :width="targetWidth"
-      :accepted-position="acceptedPosition"
-      :candidate-positions="candidatePositions"
-      @solved-position="checkSolved"
-    />
+    <div :style="{ width: targetWidth, height: targetWidth }">
+      <Train
+        v-if="acceptedPosition"
+        v-model:player="player"
+        v-model:moveList="moveList"
+        v-model:turn="turn"
+        :board="board"
+        :accepted-position="acceptedPosition"
+        :candidate-positions="candidatePositions"
+        @solved-position="checkSolved"
+      />
+    </div>
     <TrainingStats
       :number-correct="correctMoves"
       :number-incorrect="incorrectMoves"
@@ -20,7 +21,15 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, Ref, ref, computed, watch } from "vue";
+import {
+  defineComponent,
+  onMounted,
+  Ref,
+  ref,
+  computed,
+  watch,
+  StyleValue
+} from "vue";
 import Train from "../components/Train.vue";
 import TrainingStats from "../components/TrainingStats.vue";
 import { PositionApi, MoveApi } from "@/api";
@@ -48,6 +57,11 @@ export default defineComponent({
     const targetWidth = computed(() => {
       return `${Math.min(windowWidth.value - 200, windowHeight.value - 200)}px`;
     });
+    const customStyles = computed(() => {
+      return {
+        "--training-page-board-width": targetWidth.value
+      } as StyleValue;
+    });
 
     // Board initialization
     const rows = ref(19);
@@ -57,7 +71,7 @@ export default defineComponent({
     const board = ref(Board.fromDimensions(rows.value, columns.value));
     const player: Ref<1 | -1> = ref(1);
     const turn: Ref<number> = ref(0);
-    const currentTransformation = ref(Matrix.Transformation.original)
+    const currentTransformation = ref(Matrix.Transformation.original);
 
     const movesToTrain: Ref<DbType.Move[]> = ref([]);
     const currentMove = computed(() => {
@@ -72,15 +86,30 @@ export default defineComponent({
     const acceptedPosition: Ref<DbType.Position | undefined> = ref();
 
     watch(currentMove, async () => {
-      currentPosition.value = await PositionApi.getPositionById(currentMove.value.previousPositionId, true);
-      acceptedPosition.value = await PositionApi.getPositionById(currentMove.value.positionId);
+      currentPosition.value = await PositionApi.getPositionById(
+        currentMove.value.previousPositionId,
+        true
+      );
+      acceptedPosition.value = await PositionApi.getPositionById(
+        currentMove.value.positionId
+      );
 
       if (currentPosition.value) {
-        const newBoard = BoardUtil.getBoardFromPosition(currentPosition.value, columns.value, rows.value);
+        const newBoard = BoardUtil.getBoardFromPosition(
+          currentPosition.value,
+          columns.value,
+          rows.value
+        );
 
-        if (!boardIsUpdatedFromChild.value || !BoardUtil.areEqualWithTransformation(board.value, newBoard).equal) {
+        if (
+          !boardIsUpdatedFromChild.value ||
+          !BoardUtil.areEqualWithTransformation(board.value, newBoard).equal
+        ) {
           currentTransformation.value = getRandomTransformation();
-          board.value = BoardUtil.applyTransformation(newBoard, currentTransformation.value);
+          board.value = BoardUtil.applyTransformation(
+            newBoard,
+            currentTransformation.value
+          );
         }
         player.value = currentPosition.value.player === 1 ? 1 : -1;
         setCandidatePositions(currentPosition.value);
@@ -92,9 +121,12 @@ export default defineComponent({
         return await PositionApi.getPositionById(move.positionId);
       });
       const awaitedCandidates = await Promise.all(asyncCandidates);
-      const filteredCandidates = awaitedCandidates.filter(candidate => candidate !== undefined && candidate.id !== currentMove.value.id) as DbType.Position[];
+      const filteredCandidates = awaitedCandidates.filter(
+        (candidate) =>
+          candidate !== undefined && candidate.id !== currentMove.value.id
+      ) as DbType.Position[];
       candidatePositions.value = filteredCandidates;
-    }
+    };
 
     const moveList = ref([
       {
@@ -109,7 +141,7 @@ export default defineComponent({
     const checkSolved = ({
       result,
       board: solutionBoard,
-      transformation,
+      transformation
     }: {
       result: Training.Result;
       board: Board;
@@ -119,14 +151,17 @@ export default defineComponent({
         MoveApi.trainedMove(currentMove.value.id, result);
       }
       if (result === Training.Result.solved) {
-        movesToTrain.value = movesToTrain.value.slice(1, movesToTrain.value.length);
+        movesToTrain.value = movesToTrain.value.slice(
+          1,
+          movesToTrain.value.length
+        );
         currentTransformation.value = transformation;
         board.value = solutionBoard;
         boardIsUpdatedFromChild.value = true;
         correctMoves.value++;
 
         if (movesToTrain.value.length === 0) {
-          alert("All done training!")
+          alert("All done training!");
         }
       } else if (result === Training.Result.alternate) {
         player.value = -player.value as 1 | -1;
@@ -140,7 +175,10 @@ export default defineComponent({
         moveList.value.pop();
         incorrectMoves.value++;
         const moveToSave = _.cloneDeep(movesToTrain.value[0]);
-        movesToTrain.value = [...movesToTrain.value.slice(1, movesToTrain.value.length), moveToSave];
+        movesToTrain.value = [
+          ...movesToTrain.value.slice(1, movesToTrain.value.length),
+          moveToSave
+        ];
         boardIsUpdatedFromChild.value = false;
         alert("Incorrect.");
       }
@@ -155,6 +193,7 @@ export default defineComponent({
 
     return {
       targetWidth,
+      customStyles,
       player,
       turn,
       moveList,
@@ -164,7 +203,7 @@ export default defineComponent({
       candidatePositions,
       correctMoves,
       incorrectMoves,
-      remainingMoves,
+      remainingMoves
     };
   }
 });
@@ -172,7 +211,7 @@ export default defineComponent({
 
 <style>
 #train-page {
-  margin: 1rem;
+  margin: 0 1rem;
   text-align: center;
   display: grid;
   column-gap: 1rem;

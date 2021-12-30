@@ -10,6 +10,7 @@ export default defineComponent({
     <div class="nav">
       <router-link to="/">Home</router-link>
       <router-link to="/train">Train</router-link>
+      <router-link to="/statistics">Statistics</router-link>
     </div>
   </div>
 </template>

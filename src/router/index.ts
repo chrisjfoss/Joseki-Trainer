@@ -1,4 +1,5 @@
 import TrainingPage from "../views/TrainingPage.vue";
+import StatisticsPage from "../views/StatisticsPage.vue";
 import App from "../views/Home.vue";
 import {
   createRouter,
@@ -14,6 +15,10 @@ const routes = [
   {
     path: "/train",
     component: TrainingPage
+  },
+  {
+    path: "/statistics",
+    component: StatisticsPage
   }
 ];
 
