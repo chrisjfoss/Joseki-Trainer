@@ -1,5 +1,11 @@
 import { IndexableType } from "dexie";
 import { db, switchRepository, repositoryDb } from "../db";
+import {
+  importDB,
+  exportDB,
+  importInto,
+  peakImportFile
+} from "dexie-export-import";
 
 export const deleteDatabase = async () => {
   const database = await getDatabaseByName(db.name);
@@ -40,4 +46,13 @@ export const getDatabaseByName = async (name: string) => {
     .equals(name)
     .first();
   return database;
+};
+
+export const exportDatabase = async () => {
+  return await exportDB(db);
+};
+
+export const importDatabase = async (name: string, blob: Blob) => {
+  await switchToDatabase(name);
+  await importInto(db, blob, { acceptNameDiff: true });
 };

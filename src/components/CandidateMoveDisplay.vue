@@ -7,7 +7,7 @@
         :key="i"
         class="candidates-display__move"
       >
-        {{ candidate[0] + " " + candidate[1] }}
+        {{ getMoveDisplay(candidate, i) }}
       </div>
     </div>
   </div>
@@ -15,8 +15,7 @@
 <script lang="ts">
 import { computed, defineComponent } from "vue";
 import * as DbTypes from "@/db/types";
-import { Transformation } from "@/utils/matrixUtil";
-import { Matrix } from "@/utils";
+import { alpha } from "./GoBoard/ShudanPort/helper";
 
 export default defineComponent({
   name: "CandidateMoveDisplay",
@@ -35,21 +34,25 @@ export default defineComponent({
     }
   },
   setup(props) {
-    const transformedCandidates = computed(() => {
-      return (
-        props.position?.candidateMoves.map((candidate) => {
-          const point = candidate.point;
-          return Matrix.getVerticeTransformation(
-            [point.x, point.y],
-            Transformation.original,
-            props.dimensions.columns,
-            props.dimensions.rows
-          );
-        }) ?? []
-      );
+    const candidates = computed(() => {
+      return props.position?.candidateMoves ?? [];
     });
+    const getVertexName = (vertex: { x: number; y: number }) => {
+      if (!vertex) {
+        return "";
+      }
+      return `${alpha[vertex.x]}${props.dimensions.rows - vertex.y}`;
+    };
+    const getMoveDisplay = (candidate: DbTypes.Move, index: number) => {
+      let display = `${index + 1}.${getVertexName(candidate.point)}`;
+      if (candidate.comments) {
+        display += `: ${candidate.comments}`;
+      }
+      return display;
+    };
     return {
-      candidates: transformedCandidates
+      candidates: candidates,
+      getMoveDisplay
     };
   }
 });

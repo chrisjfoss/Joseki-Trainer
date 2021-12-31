@@ -37,6 +37,12 @@
     <select v-model="currentDatabase">
       <option v-for="db in databases" :key="db" :value="db">{{ db }}</option>
     </select>
+    <button @click="exportDatabase()">Export Database</button>
+    <span :style="{ color: 'white' }">
+      Import Database with name...
+      <input type="file" @input="(e) => importDatabase(e)" />
+    </span>
+    <input v-model="importDatabaseName" type="text" />
   </div>
 </template>
 
@@ -230,6 +236,29 @@ export default defineComponent({
       window.removeEventListener("keydown", cycleMove);
     });
 
+    // Export database blob
+    const exportDatabase = async () => {
+      const blob = await DatabaseApi.exportDatabase();
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `gji-${currentDatabase.value}.db`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    };
+
+    const importDatabaseName = ref("");
+    // Import database blob
+    const importDatabase = async (event: any) => {
+      const file = event.target.files[0];
+      if (!file) {
+        return;
+      }
+      await DatabaseApi.importDatabase(importDatabaseName.value, file);
+      await updateDatabaseList();
+    };
+
     return {
       displayBoard,
       board,
@@ -252,7 +281,10 @@ export default defineComponent({
       dbName,
       createDatabase,
       databases,
-      currentDatabase
+      currentDatabase,
+      exportDatabase,
+      importDatabase,
+      importDatabaseName
     };
   }
 });
