@@ -11,23 +11,30 @@ export const getSessionsForDeck = (deck: number) => {
   return [deck, (deck + 2) % 10, (deck + 5) % 10, (deck + 9) % 10];
 };
 
+export const getDeckWithSessionAtIndex = (session: number, index: number) => {
+  const modifier = [0, 2, 5, 9];
+  return (session - modifier[index]) % 10;
+};
+
 export const getCurrentSession = () => {
   const now = new Date();
-  return getSessionForDate(
-    new Date(now.getFullYear(), now.getMonth(), now.getDate())
-  );
+  return getSessionForDate(new Date());
 };
 
 export const getSessionForDate = (date: Date) => {
-  const timestamp = date.getTime();
-  return Math.floor((timestamp + 1 / (60000 * 60 * 24)) % 10);
+  const sessionDate = new Date(
+    date.getFullYear(),
+    date.getMonth(),
+    date.getDate()
+  );
+  const timestamp = sessionDate.getTime();
+  return Math.floor((timestamp + 1) / (60000 * 60 * 24)) % 10;
 };
 
 export const getNextDateForDeck = (deck: number) => {
   const sessions = getSessionsForDeck(deck);
 
   const proposedDate = new Date();
-  proposedDate.setUTCHours(0, 0, 0, 0);
   if (deck === 10) {
     return proposedDate;
   } else if (deck === 11) {
@@ -42,22 +49,48 @@ export const getNextDateForDeck = (deck: number) => {
     ++i;
   }
   return proposedDate;
-}
+};
 
 export const isFinalSession = (deck: number) => {
   const sessions = getSessionsForDeck(deck);
   return sessions[sessions.length - 1] === getCurrentSession();
 };
 
-export const getNewDeck = (success: boolean, prevDeck: number) => {
+export const switchToEquivalentDeck = (deck: number, timestamp: number) => {
+  if (deck === 10 || deck === 11) {
+    return deck;
+  }
+  const session = getSessionForDate(new Date(timestamp));
+  console.log("Eq. Session: ", session);
+  const targetSessions = getSessionsForDeck(deck);
+  console.log("Target Sessions: ", targetSessions);
+  if (targetSessions.includes(session)) {
+    const index = targetSessions.indexOf(session);
+    console.log("Index: ", index);
+    return getDeckWithSessionAtIndex(getCurrentSession(), index);
+  } else {
+    return 10;
+  }
+};
+
+export const getNewDeck = (
+  success: boolean,
+  prevDeck: number,
+  prevSessionTimestamp: number
+) => {
   if (!success) {
     return 10;
   }
   const session = getCurrentSession();
-  if (isFinalSession(prevDeck)) {
+  const transformedPrevDeck = switchToEquivalentDeck(
+    prevDeck,
+    prevSessionTimestamp
+  );
+  console.log("Transformed Prev Deck: ", transformedPrevDeck);
+  if (isFinalSession(transformedPrevDeck)) {
     return 11;
   }
-  return session;
+  return transformedPrevDeck === 10 ? session : transformedPrevDeck;
 };
 
 /**

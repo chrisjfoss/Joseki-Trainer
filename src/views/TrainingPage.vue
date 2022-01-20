@@ -21,15 +21,7 @@
 </template>
 
 <script lang="ts">
-import {
-  defineComponent,
-  onMounted,
-  Ref,
-  ref,
-  computed,
-  watch,
-  StyleValue
-} from "vue";
+import { defineComponent, onMounted, Ref, ref, computed, watch } from "vue";
 import Train from "../components/Train.vue";
 import TrainingStats from "../components/TrainingStats.vue";
 import { PositionApi, MoveApi } from "@/api";
@@ -56,11 +48,6 @@ export default defineComponent({
     };
     const targetWidth = computed(() => {
       return `${Math.min(windowWidth.value - 200, windowHeight.value - 200)}px`;
-    });
-    const customStyles = computed(() => {
-      return {
-        "--training-page-board-width": targetWidth.value
-      } as StyleValue;
     });
 
     // Board initialization
@@ -193,7 +180,6 @@ export default defineComponent({
 
     return {
       targetWidth,
-      customStyles,
       player,
       turn,
       moveList,

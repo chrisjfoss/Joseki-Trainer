@@ -43,6 +43,7 @@
       <input type="file" @input="(e) => importDatabase(e)" />
     </span>
     <input v-model="importDatabaseName" type="text" />
+    <button @click="getSession()">Get Current Session</button>
   </div>
 </template>
 
@@ -65,6 +66,7 @@ import MoveDisplay from "../components/MoveDisplay.vue";
 import { PositionApi, MoveApi, DatabaseApi } from "@/api";
 import { Player, Position } from "@/db/types";
 import CandidateMoveDisplay from "@/components/CandidateMoveDisplay.vue";
+import { getCurrentSession, getNextDateForDeck } from "@/utils/leitner";
 
 export default defineComponent({
   name: "HomePage",
@@ -259,6 +261,12 @@ export default defineComponent({
       await updateDatabaseList();
     };
 
+    const getSession = () => {
+      console.log(getCurrentSession());
+
+      console.log(getNextDateForDeck(getCurrentSession()));
+    };
+
     return {
       displayBoard,
       board,
@@ -284,7 +292,8 @@ export default defineComponent({
       currentDatabase,
       exportDatabase,
       importDatabase,
-      importDatabaseName
+      importDatabaseName,
+      getSession
     };
   }
 });

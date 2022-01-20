@@ -1,10 +1,11 @@
 import { Training } from "@/constants";
-import { Player, Position } from "@/db/types";
+import { Move, Player, Position } from "@/db/types";
 import { getAppliedTransformation, Leitner, Matrix } from "@/utils";
 import { getCurrentSession } from "@/utils/leitner";
 import { getVerticeTransformation } from "@/utils/matrixUtil";
 import GoBoard, { Vertex } from "@sabaki/go-board";
 import type { IndexableType } from "dexie";
+import { DatabaseApi, PositionApi } from ".";
 import { db } from "../db";
 import {
   getOriginalPositionFromBoard,
@@ -19,41 +20,45 @@ export const getAllMoves = async () => {
 export const getMoveCountBySessionDate = async () => {
   const moves = await db.moves.toArray();
   const movesBySessionDate = new Map<number, number>();
-  moves.forEach(move => {
-    const today = new Date();
-    today.setUTCHours(0, 0, 0, 0);
-    const currentTimestamp = today.getTime();
+  const today = new Date();
+  today.setHours(23, 59, 59, 999);
+  const endOfDay = today.getTime();
+  today.setHours(0, 0, 0, 0);
+  const startOfDay = today.getTime();
 
-    if (move.nextSessionTimestamp <= currentTimestamp) {
-      const currentCount = movesBySessionDate.get(currentTimestamp) ?? 0;
-      movesBySessionDate.set(
-        currentTimestamp,
-        currentCount + 1
-      );
+  moves.forEach((move) => {
+    if (move.nextSessionTimestamp <= endOfDay) {
+      const currentCount = movesBySessionDate.get(startOfDay) ?? 0;
+      movesBySessionDate.set(startOfDay, currentCount + 1);
+    } else {
+      const nextSession = new Date(move.nextSessionTimestamp);
+      nextSession.setHours(0, 0, 0, 0);
+      const currentCount = movesBySessionDate.get(nextSession.getTime()) ?? 0;
+      movesBySessionDate.set(nextSession.getTime(), currentCount + 1);
     }
-    else {
-      const currentCount = movesBySessionDate.get(move.nextSessionTimestamp) ?? 0
-      movesBySessionDate.set(
-        move.nextSessionTimestamp,
-        currentCount + 1
-      );
-    }
-  })
+  });
   return movesBySessionDate;
-}
+};
 
 export const getMovesForCurrentSession = async () => {
-  return await db.moves
-    .where("deck")
-    .equals(10)
-    .or("deck")
-    .equals(getCurrentSession())
-    .filter(move => {
-      const filterDate = new Date();
-      filterDate.setUTCHours(0, 0, 0, 0);
-      return move.deck === 10 || move.nextSessionTimestamp <= filterDate.getTime();
+  const playerFocus = await DatabaseApi.getCurrentRepositoryPlayer();
+  const moves = await db.moves
+    .filter((move) => {
+      const endOfDay = new Date();
+      endOfDay.setHours(24, 0, 0, 0);
+      return (
+        move.deck === 10 || move.nextSessionTimestamp <= endOfDay.getTime()
+      );
     })
     .toArray();
+  const toReturn = [] as Move[];
+  for (const move of moves) {
+    const position = await PositionApi.getPositionById(move.positionId);
+    if (position?.player == playerFocus || playerFocus == 0) {
+      toReturn.push(move);
+    }
+  }
+  return toReturn;
 };
 
 export const getMovesByPositionId = async (positionId: IndexableType) => {
@@ -64,10 +69,7 @@ export const getMovesByPositionId = async (positionId: IndexableType) => {
     .toArray();
 };
 
-export const trainedMove = async (
-  moveId: number,
-  result: Training.Result,
-) => {
+export const trainedMove = async (moveId: number, result: Training.Result) => {
   if (result === Training.Result.alternate) {
     return;
   }
@@ -77,24 +79,25 @@ export const trainedMove = async (
   }
   const currentDeck = move.deck;
   const success = result === Training.Result.solved;
-  move.deck = Leitner.getNewDeck(success, currentDeck);
+  move.deck = Leitner.getNewDeck(
+    success,
+    currentDeck,
+    move.nextSessionTimestamp
+  );
   move.nextSessionTimestamp = Leitner.getNextDateForDeck(move.deck).getTime();
   move.numberOfAttempts += 1;
   if (success) move.numberOfSuccesses += 1;
   await db.moves.put(move);
-}
+};
 
-export const updateMoveComment = async (
-  moveId: number,
-  comment: string,
-) => {
+export const updateMoveComment = async (moveId: number, comment: string) => {
   const move = await db.moves.get(moveId);
   if (!move) {
     throw new Error(`Move with id ${moveId} not found`);
   }
   move.comments = comment;
   await db.moves.put(move);
-}
+};
 
 export const saveMove = async (
   vertex: Vertex,
@@ -153,7 +156,6 @@ const addMove = async (
   previousPositionId?: IndexableType
 ) => {
   const nextSessionDate = new Date();
-  nextSessionDate.setUTCHours(0, 0, 0, 0);
   return await db.moves.add({
     point: {
       x: point[0],

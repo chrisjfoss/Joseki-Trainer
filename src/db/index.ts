@@ -11,7 +11,7 @@ export class RepositoryDatabase extends Dexie {
     super(name);
     this.version(1).stores({
       boardDimensions: "++id, [rows+columns]",
-      positions: "++id, position, boardDimensionId, ko", // Primary key and indexed props
+      positions: "++id, position, boardDimensionId, ko, tag", // Primary key and indexed props
       moves:
         "++id, point, positionId, previousPositionId, deck, nextSessionTimestamp"
     });

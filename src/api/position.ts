@@ -20,7 +20,10 @@ export const getAllPositions = async () => {
   return await db.positions.toArray();
 };
 
-export const getPositionById = async (id: IndexableType, includeCandidateMoves?: boolean) => {
+export const getPositionById = async (
+  id: IndexableType,
+  includeCandidateMoves?: boolean
+) => {
   const position = await db.positions.get(id);
   if (position && includeCandidateMoves) {
     // Get all moves for the position
@@ -146,6 +149,20 @@ const addPosition = async (
     player,
     comments: "",
     evaluation: "",
+    tag: "",
     candidateMoves: []
   } as Position);
+};
+
+export const updatePositionData = async (
+  positionId: IndexableType,
+  comments?: string,
+  evaluation?: string,
+  tag?: string
+) => {
+  return await db.positions.update(positionId, {
+    comments,
+    evaluation,
+    tag
+  });
 };

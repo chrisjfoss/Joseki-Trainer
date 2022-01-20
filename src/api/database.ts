@@ -1,11 +1,6 @@
 import { IndexableType } from "dexie";
 import { db, switchRepository, repositoryDb } from "../db";
-import {
-  importDB,
-  exportDB,
-  importInto,
-  peakImportFile
-} from "dexie-export-import";
+import { exportDB, importInto } from "dexie-export-import";
 
 export const deleteDatabase = async () => {
   const database = await getDatabaseByName(db.name);
@@ -26,6 +21,18 @@ export const createDatabase = async (name: string) => {
     console.log("Old Database: ", database);
     repositoryDb.repositories.add({ name });
   }
+};
+
+export const getCurrentDatabaseName = () => {
+  return db.name;
+};
+
+export const getCurrentRepositoryPlayer = async () => {
+  const repository = await repositoryDb.repositories
+    .where("name")
+    .equals(db.name)
+    .first();
+  return repository?.player ?? 0;
 };
 
 export const switchToDatabase = async (name: string) => {

@@ -4,6 +4,7 @@ export interface Position {
   id?: number;
   boardDimensionId: number;
   position: string;
+  tag: string;
   ko: {
     x: number;
     y: number;
