@@ -24,6 +24,7 @@
     "lodash": "^4.17.21",
     "node-sass": "^7.0.0",
     "sass": "^1.43.4",
+    "shudan-for-vue": "file:.yalc/shudan-for-vue",
     "v-calendar": "^3.0.0-alpha.6",
     "vue": "^3.0.0",
     "vue-router": "4"

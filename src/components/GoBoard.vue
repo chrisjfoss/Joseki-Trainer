@@ -1,7 +1,6 @@
 <script lang="ts">
 import { defineComponent } from "@vue/runtime-core";
 import { computed, ref } from "vue";
-import Goban from "./GoBoard/ShudanPort";
 import Board from "@sabaki/go-board";
 import { GhostStone, Vertex } from "./GoBoard/ShudanPort/types";
 import { MoveList } from "@/types";
@@ -9,7 +8,6 @@ import _ from "lodash";
 
 export default defineComponent({
   name: "GoBoard",
-  components: { Goban },
   props: {
     width: {
       type: [Number, String],

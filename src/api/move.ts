@@ -1,7 +1,6 @@
 import { Training } from "@/constants";
 import { Move, Player, Position } from "@/db/types";
 import { getAppliedTransformation, Leitner, Matrix } from "@/utils";
-import { getCurrentSession } from "@/utils/leitner";
 import { getVerticeTransformation } from "@/utils/matrixUtil";
 import GoBoard, { Vertex } from "@sabaki/go-board";
 import type { IndexableType } from "dexie";
