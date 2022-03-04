@@ -22,7 +22,8 @@ export default defineComponent({
     },
     maxHeight: {
       type: [Number, String],
-      required: true
+      required: false,
+      default: "100%"
     }
   },
   emits: ["mouseenter", "mouseleave", "click", "mouseleave:all"],

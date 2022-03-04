@@ -145,4 +145,8 @@ export default defineComponent({
     />
   </div>
 </template>
-<style lang="scss"></style>
+<style lang="scss">
+.go-board {
+  width: 100%;
+}
+</style>

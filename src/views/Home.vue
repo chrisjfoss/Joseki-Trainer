@@ -5,7 +5,6 @@
         :moves="moveList"
         :turn="turn"
         :board-height="board.height"
-        :max-height="`${targetWidth}px`"
         @mouseenter="setHoveredBoard"
         @mouseleave:all="setHoveredBoard(null)"
         @click="jumpToPosition"
@@ -20,7 +19,6 @@
       v-model:moveList="moveList"
       v-model:turn="turn"
       class="board"
-      :width="`${targetWidth}px`"
       :board="displayBoard"
       show-coordinates
       :ghost-stones="ghostStones"
@@ -95,13 +93,15 @@ export default defineComponent({
     const windowWidth = ref(window.innerWidth);
 
     window.onresize = () => {
-      windowHeight.value = window.innerHeight;
-      windowWidth.value = window.innerWidth;
+      windowHeight.value =
+        window.innerHeight ||
+        document.documentElement.clientHeight ||
+        document.body.clientHeight;
+      windowWidth.value =
+        window.innerWidth ||
+        document.documentElement.clientWidth ||
+        document.body.clientWidth;
     };
-
-    const targetWidth = computed(() => {
-      return Math.min(windowWidth.value - 200, windowHeight.value - 200);
-    });
 
     const ghostStones = ref(
       Array(rows.value)
@@ -284,7 +284,6 @@ export default defineComponent({
       getAllMoves,
       getAllPositions,
       ghostStones,
-      targetWidth,
       dbPosition,
       dbName,
       createDatabase,
