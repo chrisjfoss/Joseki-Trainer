@@ -24,6 +24,7 @@
       :ghost-stones="ghostStones"
       @update:board="(val) => (board = val)"
     />
+    <button @click="tenuki()">Tenuki</button>
     <button @click="saveMoves()">Save</button>
     <button @click="getPosition()">Get Current Position</button>
     <button @click="deleteDatabase()">Delete Database</button>
@@ -267,6 +268,10 @@ export default defineComponent({
       console.log(getNextDateForDeck(getCurrentSession()));
     };
 
+    const tenuki = () => {
+      player.value = (player.value * -1) as -1 | 1;
+    };
+
     return {
       displayBoard,
       board,
@@ -292,7 +297,8 @@ export default defineComponent({
       exportDatabase,
       importDatabase,
       importDatabaseName,
-      getSession
+      getSession,
+      tenuki
     };
   }
 });

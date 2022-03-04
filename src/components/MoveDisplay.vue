@@ -32,23 +32,81 @@ export default defineComponent({
       if (!vertex) {
         return "";
       }
+      if (isTenuki(vertex)) {
+        return "Tenuki";
+      }
       return `${alpha[vertex[0]]}${props.boardHeight - vertex[1]}`;
     };
 
-    const emitMouseEnter = (move: Move) => {
-      context.emit("mouseenter", move);
+    const tenukisBeforeTurn = computed(() => {
+      const tenukis = movesWithTenukis.value
+        .slice(0, props.turn + 1)
+        .filter((move) => isTenuki(move)).length;
+      return tenukis;
+    });
+    const movesWithTenukis = computed(() => {
+      const fullMoves: Move[] = [];
+      props.moves.forEach((move, moveIndex) => {
+        if (
+          moveIndex !== 0 &&
+          move.player === props.moves[moveIndex - 1].player
+        ) {
+          fullMoves.push({
+            player: (move.player * -1) as 1 | -1,
+            board: move.board,
+            priorMove: [-1, -1]
+          });
+        }
+        fullMoves.push(move);
+      });
+      return fullMoves;
+    });
+
+    const emitMouseEnter = (moveIndex: number) => {
+      context.emit("mouseenter", getNonTenukiMove(moveIndex));
     };
-    const emitMouseLeave = (move: Move) => {
-      context.emit("mouseleave", move);
+    const emitMouseLeave = (moveIndex: number) => {
+      context.emit("mouseleave", getNonTenukiMove(moveIndex));
     };
-    const emitClick = (move: Move, moveIndex: number) => {
-      context.emit("click", { move, turn: moveIndex });
+    const emitClick = (moveIndex: number) => {
+      let move = getNonTenukiMove(moveIndex);
+      const correctIndex = props.moves.findIndex(
+        (m) =>
+          m.player === move.player &&
+          m.board === move.board &&
+          m.priorMove === move.priorMove
+      );
+
+      context.emit("click", {
+        move: props.moves[correctIndex],
+        turn: correctIndex
+      });
     };
     const emitMouseLeaveAll = () => {
       context.emit("mouseleave:all");
     };
+
+    const getNonTenukiMove = (moveIndex: number) => {
+      let move = movesWithTenukis.value[moveIndex];
+      if (isTenuki(move)) {
+        move = movesWithTenukis.value[moveIndex - 1];
+      }
+      return move;
+    };
+
+    const isTenuki = (move: Move | Vertex) => {
+      if (move instanceof Array) {
+        return move[0] === -1 && move[1] === -1;
+      }
+      return (
+        !!move.priorMove && move.priorMove[0] === -1 && move.priorMove[1] === -1
+      );
+    };
+
     const filteredMoves = computed(() => {
-      return props.moves.filter((move, j) => j % 2 == 1);
+      const filtered = movesWithTenukis.value.filter((move, j) => j % 2 == 1);
+      console.log("Filtered moves: ", filtered);
+      return filtered;
     });
 
     return {
@@ -57,7 +115,9 @@ export default defineComponent({
       emitMouseLeave,
       emitMouseLeaveAll,
       emitClick,
-      filteredMoves
+      filteredMoves,
+      movesWithTenukis,
+      tenukisBeforeTurn
     };
   }
 });
@@ -69,19 +129,24 @@ export default defineComponent({
         <li v-if="move.priorMove" class="move">
           <span>{{ i + 1 }}.</span>
           <span
-            :class="`${turn === 2 * i + 1 ? 'current' : ''} turn`"
-            @mouseenter="emitMouseEnter(move)"
-            @mouseleave="emitMouseLeave(move)"
-            @click="emitClick(move, 2 * i + 1)"
+            :class="`${
+              turn === 2 * i + 1 - tenukisBeforeTurn ? 'current' : ''
+            } turn`"
+            @mouseenter="emitMouseEnter(2 * i + 1)"
+            @mouseleave="emitMouseLeave(2 * i + 1)"
+            @click="emitClick(2 * i + 1)"
             >{{ getVertexName(move.priorMove) }}</span
           >
           <span
-            v-if="2 * i + 2 < moves.length"
-            :class="`${turn === 2 * i + 2 ? 'current' : ''} turn`"
-            @mouseenter="emitMouseEnter(moves[2 * i + 2])"
-            @mouseleave="emitMouseLeave(moves[2 * i + 2])"
-            @click="emitClick(moves[2 * i + 2], 2 * i + 2)"
-            >{{ getVertexName(moves[2 * i + 2].priorMove) }}</span
+            v-if="2 * i + 2 < movesWithTenukis.length"
+            :class="`${
+              turn === 2 * i + 2 - tenukisBeforeTurn ? 'current' : ''
+            } turn`"
+            @mouseenter="emitMouseEnter(2 * i + 2)"
+            @mouseleave="emitMouseLeave(2 * i + 2)"
+            @click="emitClick(2 * i + 2)"
+          >
+            {{ getVertexName(movesWithTenukis[2 * i + 2].priorMove) }}</span
           >
         </li>
       </span>
