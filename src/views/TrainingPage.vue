@@ -9,6 +9,7 @@
         :board="board"
         :accepted-position="acceptedPosition"
         :candidate-positions="candidatePositions"
+        :interactable="interactable"
         @solved-position="checkSolved"
       />
     </div>
@@ -21,10 +22,18 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, Ref, ref, computed, watch } from "vue";
+import {
+  defineComponent,
+  onMounted,
+  Ref,
+  ref,
+  computed,
+  watch,
+  inject
+} from "vue";
 import Train from "../components/Train.vue";
 import TrainingStats from "../components/TrainingStats.vue";
-import { PositionApi, MoveApi } from "@/api";
+import { PositionApi, MoveApi, BoardApi } from "@/api";
 import { Move, MoveList } from "@/types";
 import * as DbType from "@/db/types";
 import Board from "@sabaki/go-board";
@@ -53,6 +62,7 @@ export default defineComponent({
     // Board initialization
     const rows = ref(19);
     const columns = ref(19);
+    const waitBetweenMoves = ref(1000);
 
     const candidatePositions: Ref<DbType.Position[]> = ref([]);
     const board = ref(Board.fromDimensions(rows.value, columns.value));
@@ -64,10 +74,14 @@ export default defineComponent({
     const currentMove = computed(() => {
       return movesToTrain.value[0];
     });
-
+    const currentDatabase = inject("currentDatabase") as Ref<string>;
+    watch(currentDatabase, async () => {
+      movesToTrain.value = await MoveApi.getMovesForCurrentSession();
+    });
     onMounted(async () => {
       movesToTrain.value = await MoveApi.getMovesForCurrentSession();
     });
+    const interactable = ref(true);
 
     const currentPosition: Ref<DbType.Position | undefined> = ref();
     const acceptedPosition: Ref<DbType.Position | undefined> = ref();
@@ -82,6 +96,14 @@ export default defineComponent({
       );
 
       if (currentPosition.value) {
+        const dbBoard = await BoardApi.getBoardFromId(
+          currentPosition.value.boardDimensionId
+        );
+        if (dbBoard) {
+          columns.value = dbBoard.columns;
+          rows.value = dbBoard.rows;
+        }
+
         const newBoard = BoardUtil.getBoardFromPosition(
           currentPosition.value,
           columns.value,
@@ -134,6 +156,9 @@ export default defineComponent({
       board: Board;
       transformation: Matrix.Transformation;
     }) => {
+      const originalBoard = board.value;
+      board.value = solutionBoard;
+      interactable.value = false;
       if (currentMove.value.id) {
         MoveApi.trainedMove(currentMove.value.id, result);
       }
@@ -143,31 +168,39 @@ export default defineComponent({
           movesToTrain.value.length
         );
         currentTransformation.value = transformation;
-        board.value = solutionBoard;
         boardIsUpdatedFromChild.value = true;
         correctMoves.value++;
+        interactable.value = true;
 
         if (movesToTrain.value.length === 0) {
           alert("All done training!");
         }
       } else if (result === Training.Result.alternate) {
-        player.value = -player.value as 1 | -1;
-        turn.value--;
-        moveList.value.pop();
-        boardIsUpdatedFromChild.value = false;
-        alert("Alternate move. Try again.");
+        setTimeout(() => {
+          player.value = -player.value as 1 | -1;
+          turn.value--;
+          moveList.value.pop();
+          boardIsUpdatedFromChild.value = false;
+          board.value = originalBoard;
+          interactable.value = true;
+          alert("Alternate move. Try again.");
+        }, waitBetweenMoves.value);
       } else {
-        player.value = -player.value as 1 | -1;
-        turn.value--;
-        moveList.value.pop();
-        incorrectMoves.value++;
-        const moveToSave = _.cloneDeep(movesToTrain.value[0]);
-        movesToTrain.value = [
-          ...movesToTrain.value.slice(1, movesToTrain.value.length),
-          moveToSave
-        ];
-        boardIsUpdatedFromChild.value = false;
-        alert("Incorrect.");
+        setTimeout(() => {
+          player.value = -player.value as 1 | -1;
+          turn.value--;
+          moveList.value.pop();
+          incorrectMoves.value++;
+          const moveToSave = _.cloneDeep(movesToTrain.value[0]);
+          movesToTrain.value = [
+            ...movesToTrain.value.slice(1, movesToTrain.value.length),
+            moveToSave
+          ];
+          boardIsUpdatedFromChild.value = false;
+          board.value = originalBoard;
+          interactable.value = true;
+          alert("Incorrect.");
+        }, waitBetweenMoves.value);
       }
     };
 
@@ -189,7 +222,8 @@ export default defineComponent({
       candidatePositions,
       correctMoves,
       incorrectMoves,
-      remainingMoves
+      remainingMoves,
+      interactable
     };
   }
 });

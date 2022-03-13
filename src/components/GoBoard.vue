@@ -14,6 +14,11 @@ export default defineComponent({
       required: false,
       default: "100%"
     },
+    maxWidth: {
+      type: [Number, String],
+      required: false,
+      default: "100%"
+    },
     board: {
       type: Object as () => InstanceType<typeof Board>,
       required: true
@@ -148,5 +153,6 @@ export default defineComponent({
 <style lang="scss">
 .go-board {
   width: 100%;
+  max-width: 800px;
 }
 </style>

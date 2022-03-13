@@ -1,8 +1,27 @@
 <script lang="ts">
-import { defineComponent } from "vue";
+import { DatabaseApi } from "@/api";
+import { defineComponent, inject, onMounted, Ref, ref, watch } from "vue";
 
 export default defineComponent({
-  name: "Header"
+  name: "Header",
+  setup() {
+    const currentDatabase = inject("currentDatabase") as Ref<string>;
+    watch(currentDatabase, async () => {
+      await DatabaseApi.switchToDatabase(currentDatabase.value);
+    });
+
+    const databases = ref([] as string[]);
+    const updateDatabaseList = async () => {
+      databases.value = await DatabaseApi.getAvailableDatabases();
+    };
+    onMounted(async () => {
+      updateDatabaseList();
+    });
+    return {
+      currentDatabase,
+      databases
+    };
+  }
 });
 </script>
 <template>
@@ -11,6 +30,12 @@ export default defineComponent({
       <router-link to="/">Home</router-link>
       <router-link to="/train">Train</router-link>
       <router-link to="/statistics">Statistics</router-link>
+    </div>
+    <div class="nav nav--end">
+      <label for="database-select">Database:</label>
+      <select id="database-select" v-model="currentDatabase">
+        <option v-for="db in databases" :key="db" :value="db">{{ db }}</option>
+      </select>
     </div>
   </div>
 </template>
@@ -30,10 +55,14 @@ export default defineComponent({
 .header .nav {
   display: flex;
   align-items: center;
-}
-.header .nav a {
-  margin-left: 1rem;
-  text-decoration: none;
   color: var(--text);
+  & a {
+    margin-left: 1rem;
+    text-decoration: none;
+    color: var(--text);
+  }
+  & label {
+    margin: 0 0.5rem;
+  }
 }
 </style>

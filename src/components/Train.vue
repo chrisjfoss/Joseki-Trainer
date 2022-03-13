@@ -1,5 +1,5 @@
 <script lang="ts">
-import { computed, PropType, ref } from "vue";
+import { computed, PropType } from "vue";
 import { defineComponent } from "@vue/runtime-core";
 import Board from "@sabaki/go-board";
 import GoBoard from "./GoBoard.vue";
@@ -44,39 +44,52 @@ export default defineComponent({
     moveList: {
       type: Array as () => MoveList,
       required: true
+    },
+    interactable: {
+      type: Boolean,
+      required: false,
+      default: true
     }
   },
   emits: ["solved-position", "update:player", "update:turn", "update:moveList"],
   setup(props, context) {
     const acceptedBoard = computed(() => {
-      return BoardUtil.getBoardFromPosition(props.acceptedPosition, props.board.width, props.board.height);
+      return BoardUtil.getBoardFromPosition(
+        props.acceptedPosition,
+        props.board.width,
+        props.board.height
+      );
     });
 
     const candidateBoards = computed(() => {
-      return props.candidatePositions.map(position => {
-        return BoardUtil.getBoardFromPosition(position, props.board.width, props.board.height);
+      return props.candidatePositions.map((position) => {
+        return BoardUtil.getBoardFromPosition(
+          position,
+          props.board.width,
+          props.board.height
+        );
       });
     });
 
     const checkMove = ({ board }: { board: Board }) => {
-      const madeAcceptedMove = BoardUtil.areEqualWithTransformation(acceptedBoard.value, board);
-      const madeCandidateMove = candidateBoards.value.map(
-        (candidateBoard) => ({
+      if (!props.interactable) return;
+      const madeAcceptedMove = BoardUtil.areEqualWithTransformation(
+        acceptedBoard.value,
+        board
+      );
+      const madeCandidateMove = candidateBoards.value
+        .map((candidateBoard) => ({
           board: candidateBoard,
           ...BoardUtil.areEqualWithTransformation(candidateBoard, board)
-        })
-      ).filter(candidateInfo => candidateInfo.equal);
-      if (
-        madeAcceptedMove.equal
-      ) {
+        }))
+        .filter((candidateInfo) => candidateInfo.equal);
+      if (madeAcceptedMove.equal) {
         context.emit("solved-position", {
           result: Training.Result.solved,
           board,
           transformation: madeAcceptedMove.transformation
         });
-      } else if (
-        madeCandidateMove.length > 0
-      ) {
+      } else if (madeCandidateMove.length > 0) {
         context.emit("solved-position", {
           result: Training.Result.alternate,
           board,
@@ -95,6 +108,7 @@ export default defineComponent({
         return props.player;
       },
       set: (value) => {
+        if (!props.interactable) return;
         context.emit("update:player", value);
       }
     });
@@ -116,11 +130,13 @@ export default defineComponent({
         context.emit("update:turn", value);
       }
     });
-    const ghostStones = ref(
-      Array(props.board.height)
+
+    const ghostStones = computed(() => {
+      if (!props.interactable) return [];
+      return Array(props.board.height)
         .fill(null)
-        .map(() => Array(props.board.width).fill(null))
-    );
+        .map(() => Array(props.board.width).fill(null));
+    });
 
     return {
       checkMove,

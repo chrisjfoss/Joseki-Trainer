@@ -1,4 +1,8 @@
 import { db } from "../db";
+export const getBoardFromId = async (id: number) => {
+  const board = await db.boardDimensions.get(id);
+  return board;
+};
 
 export const getBoard = (width: number, height: number) => {
   return db.boardDimensions

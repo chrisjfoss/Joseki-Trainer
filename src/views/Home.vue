@@ -22,9 +22,9 @@
       :board="displayBoard"
       show-coordinates
       :ghost-stones="ghostStones"
+      width="100%"
       @update:board="(val) => (board = val)"
     />
-    <button @click="tenuki()">Tenuki</button>
     <button @click="saveMoves()">Save</button>
     <button @click="getPosition()">Get Current Position</button>
     <button @click="deleteDatabase()">Delete Database</button>
@@ -33,16 +33,13 @@
     <button @click="getAllPositions()">Get All Positions</button>
     <input v-model="dbName" type="text" />
     <button @click="createDatabase()">Create Database</button>
-    <select v-model="currentDatabase">
-      <option v-for="db in databases" :key="db" :value="db">{{ db }}</option>
-    </select>
     <button @click="exportDatabase()">Export Database</button>
     <span :style="{ color: 'white' }">
       Import Database with name...
       <input type="file" @input="(e) => importDatabase(e)" />
     </span>
     <input v-model="importDatabaseName" type="text" />
-    <button @click="getSession()">Get Current Session</button>
+    <button @click="tenuki()">Tenuki</button>
   </div>
 </template>
 
@@ -50,6 +47,7 @@
 import {
   computed,
   defineComponent,
+  inject,
   onBeforeUnmount,
   onMounted,
   Ref,
@@ -65,7 +63,6 @@ import MoveDisplay from "../components/MoveDisplay.vue";
 import { PositionApi, MoveApi, DatabaseApi } from "@/api";
 import { Player, Position } from "@/db/types";
 import CandidateMoveDisplay from "@/components/CandidateMoveDisplay.vue";
-import { getCurrentSession, getNextDateForDeck } from "@/utils/leitner";
 
 export default defineComponent({
   name: "HomePage",
@@ -135,9 +132,9 @@ export default defineComponent({
     };
 
     watchEffect(setGhostStones);
-    const currentDatabase = ref("default");
+
+    const currentDatabase = inject("currentDatabase") as Ref<string>;
     watch(currentDatabase, async () => {
-      await DatabaseApi.switchToDatabase(currentDatabase.value);
       await setGhostStones();
     });
 
@@ -262,12 +259,6 @@ export default defineComponent({
       await updateDatabaseList();
     };
 
-    const getSession = () => {
-      console.log(getCurrentSession());
-
-      console.log(getNextDateForDeck(getCurrentSession()));
-    };
-
     const tenuki = () => {
       player.value = (player.value * -1) as -1 | 1;
     };
@@ -297,7 +288,6 @@ export default defineComponent({
       exportDatabase,
       importDatabase,
       importDatabaseName,
-      getSession,
       tenuki
     };
   }
