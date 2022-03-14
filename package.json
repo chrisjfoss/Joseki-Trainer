@@ -27,7 +27,9 @@
     "shudan-for-vue": "file:.yalc/shudan-for-vue",
     "v-calendar": "^3.0.0-alpha.6",
     "vue": "^3.0.0",
-    "vue-router": "4"
+    "vue-router": "4",
+    "@vueuse/rxjs": "^8.0.1",
+    "rxjs": "^7.5.5"
   },
   "devDependencies": {
     "@types/electron-devtools-installer": "^2.2.0",

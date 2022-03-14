@@ -8,9 +8,13 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, provide, ref } from "vue";
-import { DatabaseApi } from "./api";
+import { defineComponent, provide } from "vue";
 import TheHeader from "./components/Header.vue";
+
+import { liveQuery } from "dexie";
+import { useObservable } from "@vueuse/rxjs";
+import { repositoryDb } from "./db";
+import { switchToDatabase } from "./api/database";
 
 export default defineComponent({
   name: "App",
@@ -18,7 +22,17 @@ export default defineComponent({
     TheHeader
   },
   setup() {
-    const currentDatabase = ref(DatabaseApi.getCurrentDatabaseName());
+    const currentDatabase = useObservable(
+      liveQuery(async () => {
+        const repo = await repositoryDb.activeRepository.toArray();
+        if (repo.length > 0) {
+          const name = repo[0].name;
+          await switchToDatabase(name);
+          return name;
+        }
+        return "default";
+      }) as any
+    );
     provide("currentDatabase", currentDatabase);
   }
 });

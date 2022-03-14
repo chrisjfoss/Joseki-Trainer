@@ -1,6 +1,12 @@
 // Methods to enable using the Leitner System
 export const getDecksForSession = (session: number) => {
-  return [session, (session + 1) % 10, (session + 5) % 10, (session + 8) % 10];
+  return [
+    session,
+    (session + 1) % 10,
+    (session + 5) % 10,
+    (session + 8) % 10,
+    (session + 9) % 10
+  ];
 };
 
 export const getDecksForCurrentSession = () => {
@@ -8,11 +14,11 @@ export const getDecksForCurrentSession = () => {
 };
 
 export const getSessionsForDeck = (deck: number) => {
-  return [deck, (deck + 2) % 10, (deck + 5) % 10, (deck + 9) % 10];
+  return [deck, deck + 1, (deck + 2) % 10, (deck + 5) % 10, (deck + 9) % 10];
 };
 
 export const getDeckWithSessionAtIndex = (session: number, index: number) => {
-  const modifier = [0, 2, 5, 9];
+  const modifier = [0, 1, 2, 5, 9];
   return (session - modifier[index]) % 10;
 };
 
@@ -61,12 +67,9 @@ export const switchToEquivalentDeck = (deck: number, timestamp: number) => {
     return deck;
   }
   const session = getSessionForDate(new Date(timestamp));
-  console.log("Eq. Session: ", session);
   const targetSessions = getSessionsForDeck(deck);
-  console.log("Target Sessions: ", targetSessions);
   if (targetSessions.includes(session)) {
     const index = targetSessions.indexOf(session);
-    console.log("Index: ", index);
     return getDeckWithSessionAtIndex(getCurrentSession(), index);
   } else {
     return 10;
@@ -86,7 +89,6 @@ export const getNewDeck = (
     prevDeck,
     prevSessionTimestamp
   );
-  console.log("Transformed Prev Deck: ", transformedPrevDeck);
   if (isFinalSession(transformedPrevDeck)) {
     return 11;
   }

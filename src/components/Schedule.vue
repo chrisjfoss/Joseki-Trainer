@@ -28,7 +28,6 @@ export default defineComponent({
     const moveCountBySessionDate = ref(new Map<number, number>());
     onMounted(async () => {
       moveCountBySessionDate.value = await MoveApi.getMoveCountBySessionDate();
-      console.log(moveCountBySessionDate.value);
     });
 
     const calendarAttrs = computed(() => {
@@ -51,7 +50,6 @@ export default defineComponent({
         });
         ++i;
       }
-      console.log("returnAttrs", returnAttrs);
       return returnAttrs;
     });
     return {

@@ -40,6 +40,7 @@
     </span>
     <input v-model="importDatabaseName" type="text" />
     <button @click="tenuki()">Tenuki</button>
+    <button @click="deletePositions()">Delete current line</button>
   </div>
 </template>
 
@@ -135,6 +136,7 @@ export default defineComponent({
 
     const currentDatabase = inject("currentDatabase") as Ref<string>;
     watch(currentDatabase, async () => {
+      console.log("Watching: ", currentDatabase.value);
       await setGhostStones();
     });
 
@@ -263,6 +265,35 @@ export default defineComponent({
       player.value = (player.value * -1) as -1 | 1;
     };
 
+    const isLastMoveTenuki = computed(() => {
+      return moveList.value[turn.value].player === player.value;
+    });
+
+    const deletePositions = async () => {
+      if (turn.value > 0) {
+        const prevTurnPlayer = isLastMoveTenuki.value
+          ? player.value
+          : ((player.value * -1) as -1 | 1);
+        const prevPosition = await PositionApi.getPositionFromBoard(
+          moveList.value[turn.value - 1].board,
+          prevTurnPlayer
+        );
+        const currentPosition = await PositionApi.getPositionFromBoard(
+          moveList.value[turn.value].board,
+          moveList.value[turn.value].player === 1 ? -1 : 1
+        );
+        if (prevPosition?.id && currentPosition?.id) {
+          const dbMove = await MoveApi.getMoveByPrevAndCurrentPositionId(
+            prevPosition.id,
+            currentPosition.id
+          );
+          if (dbMove?.id) {
+            await MoveApi.removeLine(dbMove.id);
+          }
+        }
+      }
+    };
+
     return {
       displayBoard,
       board,
@@ -283,12 +314,11 @@ export default defineComponent({
       dbPosition,
       dbName,
       createDatabase,
-      databases,
-      currentDatabase,
       exportDatabase,
       importDatabase,
       importDatabaseName,
-      tenuki
+      tenuki,
+      deletePositions
     };
   }
 });

@@ -68,6 +68,47 @@ export const getMovesByPositionId = async (positionId: IndexableType) => {
     .toArray();
 };
 
+export const removeLine = async (moveId: IndexableType) => {
+  const move = await db.moves.get(moveId);
+  if (!move?.positionId) return;
+  // const position = getPositionById(move.positionId);
+
+  const movesToReachPosition = await getMovesToReachPositionId(move.positionId);
+
+  if (movesToReachPosition.length === 1) {
+    const positionMoves = await getMovesByPositionId(move.positionId);
+    // Remove position
+    await db.positions.delete(move.positionId);
+    positionMoves.forEach((positionMove) => {
+      if (positionMove.id) {
+        removeLine(positionMove.id);
+      }
+    });
+  }
+  // Remove move
+  removeMove(moveId);
+};
+
+export const removeMove = (moveId: IndexableType) => {
+  return db.moves.delete(moveId);
+};
+
+export const getMoveByPrevAndCurrentPositionId = async (
+  prevPositionId: IndexableType,
+  currentPositionId: IndexableType
+) => {
+  return await db.moves
+    .where("previousPositionId")
+    .equals(prevPositionId)
+    .and((move) => move.positionId === currentPositionId)
+    .first();
+};
+
+export const getMovesToReachPositionId = async (positionId: IndexableType) => {
+  // Get all moves for the position
+  return await db.moves.where("positionId").equals(positionId).toArray();
+};
+
 export const trainedMove = async (moveId: number, result: Training.Result) => {
   if (result === Training.Result.alternate) {
     return;

@@ -105,7 +105,6 @@ export default defineComponent({
 
     const filteredMoves = computed(() => {
       const filtered = movesWithTenukis.value.filter((move, j) => j % 2 == 1);
-      console.log("Filtered moves: ", filtered);
       return filtered;
     });
 

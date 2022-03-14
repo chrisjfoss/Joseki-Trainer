@@ -1,6 +1,7 @@
 import { IndexableType } from "dexie";
 import { db, switchRepository, repositoryDb } from "../db";
 import { exportDB, importInto } from "dexie-export-import";
+import { computed } from "vue";
 
 export const deleteDatabase = async () => {
   const database = await getDatabaseByName(db.name);
@@ -37,6 +38,16 @@ export const getCurrentRepositoryPlayer = async () => {
 
 export const switchToDatabase = async (name: string) => {
   await createDatabase(name);
+
+  const activeRepository = await repositoryDb.activeRepository.toArray();
+  if (activeRepository.length > 0 && activeRepository[0].id) {
+    await repositoryDb.activeRepository.update(activeRepository[0].id, {
+      name
+    });
+  } else {
+    await repositoryDb.activeRepository.add({ name });
+  }
+
   db.close();
   switchRepository(name);
   await db.open();
