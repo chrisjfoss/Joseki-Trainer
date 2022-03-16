@@ -1,6 +1,8 @@
 import TrainingPage from "../views/TrainingPage.vue";
 import StatisticsPage from "../views/StatisticsPage.vue";
+import DatabasePage from "../views/DatabasePage.vue";
 import App from "../views/Home.vue";
+
 import {
   createRouter,
   createWebHashHistory,
@@ -19,6 +21,10 @@ const routes = [
   {
     path: "/statistics",
     component: StatisticsPage
+  },
+  {
+    path: "/databases",
+    component: DatabasePage
   }
 ];
 

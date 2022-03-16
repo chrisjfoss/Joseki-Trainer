@@ -14,7 +14,7 @@ export default defineComponent({
   }
 });
 </script>
-<style lang="scss">
+<style lang="scss" scoped>
 .statistics-page {
   margin: 0 1rem;
   display: grid;

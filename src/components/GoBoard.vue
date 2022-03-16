@@ -150,7 +150,7 @@ export default defineComponent({
     />
   </div>
 </template>
-<style lang="scss">
+<style lang="scss" scoped>
 .go-board {
   width: 100%;
   max-width: 800px;

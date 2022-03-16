@@ -136,7 +136,6 @@ export default defineComponent({
 
     const currentDatabase = inject("currentDatabase") as Ref<string>;
     watch(currentDatabase, async () => {
-      console.log("Watching: ", currentDatabase.value);
       await setGhostStones();
     });
 
@@ -210,7 +209,7 @@ export default defineComponent({
     };
 
     const deleteDatabase = async () => {
-      await DatabaseApi.deleteDatabase();
+      await DatabaseApi.deleteDatabase(DatabaseApi.getCurrentDatabaseName());
     };
 
     const getAvailableDatabases = async () => {

@@ -162,4 +162,4 @@ export default defineComponent({
     />
   </div>
 </template>
-<style lang="scss"></style>
+<style scoped lang="scss"></style>

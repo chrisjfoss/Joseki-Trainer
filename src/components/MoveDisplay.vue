@@ -152,7 +152,7 @@ export default defineComponent({
     </ul>
   </div>
 </template>
-<style lang="scss">
+<style scoped lang="scss">
 .move-list {
   list-style: none;
   padding: 1.5rem;

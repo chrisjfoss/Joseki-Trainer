@@ -229,7 +229,7 @@ export default defineComponent({
 });
 </script>
 
-<style>
+<style lang="scss" scoped>
 #train-page {
   margin: 0 1rem;
   text-align: center;

@@ -15,32 +15,35 @@ export default defineComponent({
     numberRemaining: {
       type: Number,
       required: true
-    },
+    }
   },
   setup(props) {
     const base = computed(() => {
-      return Math.max(props.numberCorrect + props.numberRemaining, props.numberIncorrect + props.numberRemaining);
+      return Math.max(
+        props.numberCorrect + props.numberRemaining,
+        props.numberIncorrect + props.numberRemaining
+      );
     });
 
     const percentageCorrect = computed(() => {
-      return Math.round(props.numberCorrect / base.value * 100);
+      return Math.round((props.numberCorrect / base.value) * 100);
     });
 
     const percentageIncorrect = computed(() => {
-      return Math.round(props.numberIncorrect / base.value * 100);
+      return Math.round((props.numberIncorrect / base.value) * 100);
     });
 
     const percentageRemaining = computed(() => {
-      return Math.round(props.numberRemaining / base.value * 100);
+      return Math.round((props.numberRemaining / base.value) * 100);
     });
 
     return {
       percentageCorrect,
       percentageIncorrect,
-      percentageRemaining,
-    }
+      percentageRemaining
+    };
   }
-})
+});
 </script>
 <template>
   <div id="stats" class="stats">
@@ -49,19 +52,28 @@ export default defineComponent({
     <span class="stats__label">Remaining</span>
     <div class="correct-bar">
       {{ numberCorrect }}
-      <div class="correct-bar__fill" :style="{ height: `${percentageCorrect}%` }"></div>
+      <div
+        class="correct-bar__fill"
+        :style="{ height: `${percentageCorrect}%` }"
+      ></div>
     </div>
     <div class="incorrect-bar">
       {{ numberIncorrect }}
-      <div class="incorrect-bar__fill" :style="{ height: `${percentageIncorrect}%` }"></div>
+      <div
+        class="incorrect-bar__fill"
+        :style="{ height: `${percentageIncorrect}%` }"
+      ></div>
     </div>
     <div class="remaining-bar">
       {{ numberRemaining }}
-      <div class="remaining-bar__fill" :style="{ height: `${percentageRemaining}%` }"></div>
+      <div
+        class="remaining-bar__fill"
+        :style="{ height: `${percentageRemaining}%` }"
+      ></div>
     </div>
   </div>
 </template>
-<style lang="scss">
+<style scoped lang="scss">
 .stats {
   border: 1px solid var(--text);
   display: grid;

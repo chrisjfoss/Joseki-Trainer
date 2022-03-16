@@ -1,15 +1,23 @@
 import { IndexableType } from "dexie";
-import { db, switchRepository, repositoryDb } from "../db";
+import {
+  db,
+  switchRepository,
+  repositoryDb,
+  getNewDatabaseInstance
+} from "../db";
 import { exportDB, importInto } from "dexie-export-import";
-import { computed } from "vue";
 
-export const deleteDatabase = async () => {
-  const database = await getDatabaseByName(db.name);
-  await db.delete();
+export const deleteDatabase = async (name: string) => {
+  const currentDatabase = getCurrentDatabaseName();
+  const database = await getDatabaseByName(name);
+  if (name === currentDatabase) {
+    await switchToDatabase("default");
+  }
+  const dbToDelete = getNewDatabaseInstance(name);
   if (database) {
     await repositoryDb.repositories.delete(database.id as IndexableType);
   }
-  await db.open();
+  await dbToDelete.delete();
 };
 
 export const createDatabase = async (name: string) => {
@@ -47,9 +55,8 @@ export const switchToDatabase = async (name: string) => {
   } else {
     await repositoryDb.activeRepository.add({ name });
   }
-
   db.close();
-  switchRepository(name);
+  await switchRepository(name);
   await db.open();
 };
 

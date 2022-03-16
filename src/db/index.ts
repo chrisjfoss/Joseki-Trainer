@@ -38,4 +38,9 @@ export const switchRepository = async (name: string) => {
   _db = new RepositoryDatabase(name);
 };
 
+// Only use to make changes to a database instance without opening it up for user access
+export const getNewDatabaseInstance = (name: string) => {
+  return new RepositoryDatabase(name);
+};
+
 export { _db as db };
