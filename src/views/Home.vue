@@ -33,7 +33,6 @@
     <button @click="getAllPositions()">Get All Positions</button>
     <input v-model="dbName" type="text" />
     <button @click="createDatabase()">Create Database</button>
-    <button @click="exportDatabase()">Export Database</button>
     <span :style="{ color: 'white' }">
       Import Database with name...
       <input type="file" @input="(e) => importDatabase(e)" />
@@ -237,18 +236,6 @@ export default defineComponent({
       window.removeEventListener("keydown", cycleMove);
     });
 
-    // Export database blob
-    const exportDatabase = async () => {
-      const blob = await DatabaseApi.exportDatabase();
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = `gji-${currentDatabase.value}.db`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    };
-
     const importDatabaseName = ref("");
     // Import database blob
     const importDatabase = async (event: any) => {
@@ -313,7 +300,6 @@ export default defineComponent({
       dbPosition,
       dbName,
       createDatabase,
-      exportDatabase,
       importDatabase,
       importDatabaseName,
       tenuki,

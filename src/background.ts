@@ -3,11 +3,16 @@
 import { app, protocol, BrowserWindow } from "electron";
 import { createProtocol } from "vue-cli-plugin-electron-builder/lib";
 import installExtension, { VUEJS3_DEVTOOLS } from "electron-devtools-installer";
+import path from "path";
+
+import "@/setup/menu";
+
 const isDevelopment = process.env.NODE_ENV !== "production";
+declare const __static: string;
 
 // Scheme must be registered before the app is ready
 protocol.registerSchemesAsPrivileged([
-  { scheme: "app", privileges: { secure: true, standard: true } },
+  { scheme: "app", privileges: { secure: true, standard: true } }
 ]);
 
 async function createWindow() {
@@ -21,7 +26,8 @@ async function createWindow() {
       nodeIntegration: process.env
         .ELECTRON_NODE_INTEGRATION as unknown as boolean,
       contextIsolation: !process.env.ELECTRON_NODE_INTEGRATION,
-    },
+      preload: path.join(__static, "preload.js")
+    }
   });
 
   if (process.env.WEBPACK_DEV_SERVER_URL) {
