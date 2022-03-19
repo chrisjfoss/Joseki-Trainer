@@ -1,6 +1,5 @@
 import { app, BrowserWindow, ipcMain, Menu } from "electron";
-import { saveBufferToFile } from "./helpers/saveFile";
-// import { saveBlobToFile } from "./helpers/saveFile";
+import { FileUtil } from "@/background/utils";
 
 const isMac = process.platform === "darwin";
 
@@ -34,15 +33,25 @@ const template = [
           const win = BrowserWindow.getFocusedWindow();
           if (win) {
             win.webContents.send("export-db");
-            ipcMain.on(
+            ipcMain.once(
               "export-db-complete",
               (
                 event: Electron.Event,
                 { buffer, name }: { buffer: ArrayBuffer; name: string }
               ) => {
-                saveBufferToFile(buffer, name);
+                FileUtil.saveBufferToFile(buffer, name);
               }
             );
+          }
+        }
+      },
+      {
+        label: "Import Database(s)",
+        click: async () => {
+          const win = BrowserWindow.getFocusedWindow();
+          if (win) {
+            const files = await FileUtil.openDbFiles();
+            win.webContents.send("import-db", files);
           }
         }
       },

@@ -1,22 +1,29 @@
 <script lang="ts">
 import { DatabaseApi } from "@/api";
-import { defineComponent, inject, onMounted, Ref, ref, watch } from "vue";
+import { defineComponent, inject, Ref, ref, watch } from "vue";
 
 export default defineComponent({
   name: "Header",
   setup() {
     const currentDatabase = inject("currentDatabase") as Ref<string>;
-    watch(currentDatabase, async () => {
-      await DatabaseApi.switchToDatabase(currentDatabase.value);
-    });
+    const refetchDatabaseInfo = inject("refetchDatabaseInfo") as Ref<string>;
 
     const databases = ref([] as string[]);
     const updateDatabaseList = async () => {
       databases.value = await DatabaseApi.getAvailableDatabases();
     };
-    onMounted(async () => {
-      updateDatabaseList();
-    });
+
+    watch(
+      refetchDatabaseInfo,
+      () => {
+        if (refetchDatabaseInfo.value) {
+          updateDatabaseList();
+        }
+      },
+      {
+        immediate: true
+      }
+    );
     return {
       currentDatabase,
       databases

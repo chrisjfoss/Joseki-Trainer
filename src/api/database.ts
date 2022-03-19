@@ -20,16 +20,19 @@ export const deleteDatabase = async (name: string) => {
   await dbToDelete.delete();
 };
 
-export const createDatabase = async (name: string) => {
+export const createDatabase = async (name: string): Promise<boolean> => {
   const database = await getDatabaseByName(name);
   if (db.name === name) {
-    return;
+    return false;
   }
   if (!database && name !== "default") {
     console.log("Creating new database", name);
     console.log("Old Database: ", database);
     repositoryDb.repositories.add({ name });
+    console.log("Created database", name);
+    return true;
   }
+  return false;
 };
 
 export const getCurrentDatabaseName = () => {
@@ -45,6 +48,9 @@ export const getCurrentRepositoryPlayer = async () => {
 };
 
 export const switchToDatabase = async (name: string) => {
+  if (getCurrentDatabaseName() === name) {
+    return;
+  }
   await createDatabase(name);
 
   const activeRepository = await repositoryDb.activeRepository.toArray();
@@ -78,6 +84,15 @@ export const exportDatabase = async () => {
 };
 
 export const importDatabase = async (name: string, blob: Blob) => {
-  await switchToDatabase(name);
-  await importInto(db, blob, { acceptNameDiff: true });
+  let increment = 0;
+  let nameToUse = name;
+  // Take first available name
+
+  while (!(await createDatabase(nameToUse))) {
+    increment += 1;
+    nameToUse = `${name} (${increment})`;
+  }
+  await importInto(getNewDatabaseInstance(nameToUse), blob, {
+    acceptNameDiff: true
+  });
 };

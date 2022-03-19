@@ -133,10 +133,18 @@ export default defineComponent({
 
     watchEffect(setGhostStones);
 
-    const currentDatabase = inject("currentDatabase") as Ref<string>;
-    watch(currentDatabase, async () => {
-      await setGhostStones();
-    });
+    const refetchDatabaseInfo = inject("refetchDatabaseInfo") as Ref<string>;
+    watch(
+      refetchDatabaseInfo,
+      async () => {
+        if (refetchDatabaseInfo.value) {
+          await setGhostStones();
+        }
+      },
+      {
+        immediate: true
+      }
+    );
 
     const saveMoves = async () => {
       let priorBoard: Board | null = null;

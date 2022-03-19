@@ -10,20 +10,22 @@ class SingletonUtilStorage {
     keyof Matrix.TransformationCollection<Sign>,
     string
   > = {
-      original: "",
-      rot90: "",
-      rot180: "",
-      rot270: "",
-      mirror: "",
-      mirrorRot90: "",
-      mirrorRot180: "",
-      mirrorRot270: ""
-    };
+    original: "",
+    rot90: "",
+    rot180: "",
+    rot270: "",
+    mirror: "",
+    mirrorRot90: "",
+    mirrorRot180: "",
+    mirrorRot270: ""
+  };
 }
 
 export const getRandomTransformation = () => {
   // Get random transformation from Matrix.Transformation enum
-  const transformation = Math.floor(Math.random() * Object.keys(Matrix.Transformation).length / 2) as Matrix.Transformation;
+  const transformation = Math.floor(
+    (Math.random() * Object.keys(Matrix.Transformation).length) / 2
+  ) as Matrix.Transformation;
   return transformation;
 };
 
@@ -167,7 +169,7 @@ const getAppliedTransformation = (
   for (let i = 0; i < keys.length; i++) {
     if (
       positionStrings[
-      keys[i] as keyof Matrix.TransformationCollection<Sign>
+        keys[i] as keyof Matrix.TransformationCollection<Sign>
       ] === transformedPositionString
     ) {
       return Matrix.Transformation[keys[i]];

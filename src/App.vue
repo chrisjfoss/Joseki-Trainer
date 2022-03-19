@@ -8,7 +8,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, provide } from "vue";
+import { defineComponent, onMounted, provide, Ref, ref, watch } from "vue";
 import TheHeader from "./components/Header.vue";
 
 import { liveQuery } from "dexie";
@@ -17,6 +17,13 @@ import { repositoryDb } from "./db";
 import { switchToDatabase } from "./api/database";
 import { DatabaseApi } from "./api";
 
+const apiWindow = window as typeof window & {
+  api: {
+    send: Function;
+    receive: Function;
+  };
+};
+
 export default defineComponent({
   name: "App",
   components: {
@@ -24,26 +31,48 @@ export default defineComponent({
   },
   setup() {
     onMounted(() => {
-      (window as any).api.receive("export-db", async () => {
+      apiWindow.api.receive("export-db", async () => {
         const buffer = await (await DatabaseApi.exportDatabase()).arrayBuffer();
-        (window as any).api.send("export-db-complete", {
+        apiWindow.api.send("export-db-complete", {
           buffer,
           name: DatabaseApi.getCurrentDatabaseName()
         });
       });
+      apiWindow.api.receive(
+        "import-db",
+        async (files: { fileName: string; buffer: Buffer }[][]) => {
+          files[0].forEach(async ({ fileName, buffer }) => {
+            refetchDatabaseInfo.value = false;
+            await DatabaseApi.importDatabase(fileName, new Blob([buffer]));
+            refetchDatabaseInfo.value = true;
+          });
+        }
+      );
     });
-    const currentDatabase = useObservable(
+    const readonlyActiveDatabase = useObservable(
       liveQuery(async () => {
         const repo = await repositoryDb.activeRepository.toArray();
         if (repo.length > 0) {
           const name = repo[0].name;
-          await switchToDatabase(name);
           return name;
         }
         return "default";
       }) as any
-    );
+    ) as Readonly<Ref<string>>;
+    const currentDatabase = ref("");
+    const refetchDatabaseInfo = ref(false);
+    watch(readonlyActiveDatabase, () => {
+      currentDatabase.value = readonlyActiveDatabase.value;
+    });
+    watch(currentDatabase, async () => {
+      refetchDatabaseInfo.value = false;
+      await switchToDatabase(currentDatabase.value as string);
+      refetchDatabaseInfo.value = true;
+    });
+    // This is the value to change
     provide("currentDatabase", currentDatabase);
+    // This is the value to watch
+    provide("refetchDatabaseInfo", refetchDatabaseInfo);
   }
 });
 </script>

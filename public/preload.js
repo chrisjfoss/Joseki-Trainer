@@ -8,5 +8,10 @@ contextBridge.exposeInMainWorld('api', {
         ipcRenderer.on(event, (event, ...data) => {
             callback(data);
         });
+    },
+    receiveOnce: (event, callback) => {
+        ipcRenderer.once(event, (event, ...data) => {
+            callback(data);
+        });
     }
 })
