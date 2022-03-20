@@ -20,7 +20,10 @@ export const deleteDatabase = async (name: string) => {
   await dbToDelete.delete();
 };
 
-export const createDatabase = async (name: string): Promise<boolean> => {
+export const createDatabase = async (
+  name: string,
+  player?: -1 | 0 | 1
+): Promise<boolean> => {
   const database = await getDatabaseByName(name);
   if (db.name === name) {
     return false;
@@ -28,7 +31,7 @@ export const createDatabase = async (name: string): Promise<boolean> => {
   if (!database && name !== "default") {
     console.log("Creating new database", name);
     console.log("Old Database: ", database);
-    repositoryDb.repositories.add({ name });
+    repositoryDb.repositories.add({ name, player: player || 0 });
     console.log("Created database", name);
     return true;
   }
