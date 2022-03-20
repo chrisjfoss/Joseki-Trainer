@@ -20,13 +20,19 @@
 </template>
 <script lang="ts">
 import { MoveApi } from "@/api";
-import { computed, defineComponent, onMounted, ref } from "vue";
+import { computed, defineComponent, inject, onMounted, ref, watch } from "vue";
+import type { Ref } from "vue";
 
 export default defineComponent({
   name: "Schedule",
   setup() {
     const moveCountBySessionDate = ref(new Map<number, number>());
     onMounted(async () => {
+      moveCountBySessionDate.value = await MoveApi.getMoveCountBySessionDate();
+    });
+
+    const refetchDatabaseInfo = inject("refetchDatabaseInfo") as Ref<boolean>;
+    watch(refetchDatabaseInfo, async () => {
       moveCountBySessionDate.value = await MoveApi.getMoveCountBySessionDate();
     });
 

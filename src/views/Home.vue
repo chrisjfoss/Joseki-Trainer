@@ -33,11 +33,6 @@
     <button @click="getAllPositions()">Get All Positions</button>
     <input v-model="dbName" type="text" />
     <button @click="createDatabase()">Create Database</button>
-    <span :style="{ color: 'white' }">
-      Import Database with name...
-      <input type="file" @input="(e) => importDatabase(e)" />
-    </span>
-    <input v-model="importDatabaseName" type="text" />
     <button @click="tenuki()">Tenuki</button>
     <button @click="deletePositions()">Delete current line</button>
   </div>
@@ -244,17 +239,6 @@ export default defineComponent({
       window.removeEventListener("keydown", cycleMove);
     });
 
-    const importDatabaseName = ref("");
-    // Import database blob
-    const importDatabase = async (event: any) => {
-      const file = event.target.files[0];
-      if (!file) {
-        return;
-      }
-      await DatabaseApi.importDatabase(importDatabaseName.value, file);
-      await updateDatabaseList();
-    };
-
     const tenuki = () => {
       player.value = (player.value * -1) as -1 | 1;
     };
@@ -308,8 +292,6 @@ export default defineComponent({
       dbPosition,
       dbName,
       createDatabase,
-      importDatabase,
-      importDatabaseName,
       tenuki,
       deletePositions
     };
