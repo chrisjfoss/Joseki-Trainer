@@ -9,26 +9,29 @@ import { getVerticeTransformation } from "@/utils/matrixUtil";
 import type GoBoard from "@sabaki/go-board";
 import { Sign, Vertex } from "@sabaki/go-board";
 import { IndexableType } from "dexie";
-import { db } from "../db";
-import { MoveApi } from ".";
+import { DatabaseApi, MoveApi } from ".";
 
 interface GoBoardWithKo extends GoBoard {
   _koInfo: { sign: Sign; vertex: Vertex };
 }
 
-export const getAllPositions = async () => {
+export const getAllPositions = async (dbName?: string) => {
+  const db = await DatabaseApi.getDatabaseRepository(dbName);
   return await db.positions.toArray();
 };
 
 export const getPositionById = async (
   id: IndexableType,
-  includeCandidateMoves?: boolean
+  includeCandidateMoves?: boolean,
+  dbName?: string
 ) => {
+  const db = await DatabaseApi.getDatabaseRepository(dbName);
   const position = await db.positions.get(id);
   if (position && includeCandidateMoves) {
     // Get all moves for the position
     position.candidateMoves = await MoveApi.getMovesByPositionId(
-      position.id as IndexableType
+      position.id as IndexableType,
+      dbName
     );
   }
   return position;
@@ -36,8 +39,10 @@ export const getPositionById = async (
 
 export const getOriginalPositionFromBoard = async (
   board: GoBoard,
-  player: Player
+  player: Player,
+  dbName?: string
 ) => {
+  const db = await DatabaseApi.getDatabaseRepository(dbName);
   return await db.transaction("r", db.positions, db.moves, async () => {
     // Get all position transformations
     const { original, ...positionStrings } = getAllPositionStrings(board);
@@ -73,14 +78,19 @@ export const getOriginalPositionFromBoard = async (
   });
 };
 
-export const getPositionFromBoard = async (board: GoBoard, player: Player) => {
-  const dbPosition = await getOriginalPositionFromBoard(board, player);
+export const getPositionFromBoard = async (
+  board: GoBoard,
+  player: Player,
+  dbName?: string
+) => {
+  const dbPosition = await getOriginalPositionFromBoard(board, player, dbName);
   const transformations = getAllPositionStrings(board);
 
   if (dbPosition) {
     // Get all moves for the position
     dbPosition.candidateMoves = await MoveApi.getMovesByPositionId(
-      dbPosition.id as IndexableType
+      dbPosition.id as IndexableType,
+      dbName
     );
 
     // Transform results
@@ -139,6 +149,7 @@ const addPosition = async (
   player: number,
   ko: Vertex
 ) => {
+  const db = await DatabaseApi.getDatabaseRepository();
   return await db.positions.add({
     boardDimensionId: boardId,
     position: positionString,
@@ -160,6 +171,7 @@ export const updatePositionData = async (
   evaluation?: string,
   tag?: string
 ) => {
+  const db = await DatabaseApi.getDatabaseRepository();
   return await db.positions.update(positionId, {
     comments,
     evaluation,

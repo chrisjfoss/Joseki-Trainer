@@ -42,10 +42,11 @@ export const getCurrentDatabaseName = () => {
   return db.name;
 };
 
-export const getCurrentRepositoryPlayer = async () => {
+export const getRepositoryPlayer = async (name?: string) => {
+  const dbName = name ? name : getCurrentDatabaseName();
   const repository = await repositoryDb.repositories
     .where("name")
-    .equals(db.name)
+    .equals(dbName)
     .first();
   return repository?.player ?? 0;
 };
@@ -82,8 +83,13 @@ export const getDatabaseByName = async (name: string) => {
   return database;
 };
 
-export const exportDatabase = async () => {
-  return await exportDB(db);
+export const getDatabaseRepository = async (name?: string) => {
+  return name ? getNewDatabaseInstance(name) || db : db;
+};
+
+export const exportDatabase = async (name?: string) => {
+  const localDb = await getDatabaseRepository(name);
+  return await exportDB(localDb);
 };
 
 export const importDatabase = async (name: string, blob: Blob) => {
