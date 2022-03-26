@@ -17,6 +17,7 @@ export const getAllMoves = async () => {
 };
 
 export const getMoveCountBySessionDate = async () => {
+  const playerFocus = await DatabaseApi.getCurrentRepositoryPlayer();
   const moves = await db.moves.toArray();
   const movesBySessionDate = new Map<number, number>();
   const today = new Date();
@@ -25,17 +26,25 @@ export const getMoveCountBySessionDate = async () => {
   today.setHours(0, 0, 0, 0);
   const startOfDay = today.getTime();
 
-  moves.forEach((move) => {
-    if (move.nextSessionTimestamp <= endOfDay) {
-      const currentCount = movesBySessionDate.get(startOfDay) ?? 0;
-      movesBySessionDate.set(startOfDay, currentCount + 1);
-    } else {
-      const nextSession = new Date(move.nextSessionTimestamp);
-      nextSession.setHours(0, 0, 0, 0);
-      const currentCount = movesBySessionDate.get(nextSession.getTime()) ?? 0;
-      movesBySessionDate.set(nextSession.getTime(), currentCount + 1);
-    }
-  });
+  await Promise.all(
+    moves.map(async (move) => {
+      if (playerFocus !== 0) {
+        const position = await PositionApi.getPositionById(move.positionId);
+        if (position?.player !== playerFocus) {
+          return;
+        }
+      }
+      if (move.nextSessionTimestamp <= endOfDay) {
+        const currentCount = movesBySessionDate.get(startOfDay) ?? 0;
+        movesBySessionDate.set(startOfDay, currentCount + 1);
+      } else {
+        const nextSession = new Date(move.nextSessionTimestamp);
+        nextSession.setHours(0, 0, 0, 0);
+        const currentCount = movesBySessionDate.get(nextSession.getTime()) ?? 0;
+        movesBySessionDate.set(nextSession.getTime(), currentCount + 1);
+      }
+    })
+  );
   return movesBySessionDate;
 };
 

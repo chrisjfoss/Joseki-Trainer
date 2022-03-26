@@ -7,22 +7,17 @@
         type="text"
         placeholder="Database name"
       />
-      <div>
-        <p>Player:</p>
-        <select v-model="newDatabasePlayer">
-          <option value="0">All</option>
-          <option value="-1">Black</option>
-          <option value="1">White</option>
-        </select>
-      </div>
+      <p>Player:</p>
+      <select v-model="newDatabasePlayer">
+        <option value="0">All</option>
+        <option value="-1">Black</option>
+        <option value="1">White</option>
+      </select>
 
       <button @click="createDatabase">Create</button>
     </div>
-    <p>Delete an existing database</p>
-    <p>Rename a database</p>
-
+    <p>Databases (Edit & Delete)</p>
     <div class="databases">
-      <p class="databases__header">Databases</p>
       <div class="databases__list">
         <ul>
           <li v-for="database in databases" :key="database">
@@ -64,13 +59,17 @@ export default defineComponent({
     });
 
     const newDatabaseName = ref("");
-    const newDatabasePlayer = ref(0) as Ref<0 | 1 | -1>;
+    const newDatabasePlayer = ref("0") as Ref<"0" | "1" | "-1">;
 
     const createDatabase = async () => {
       const name = newDatabaseName.value;
       if (name) {
         refetchDatabaseInfo.value = false;
-        await DatabaseApi.createDatabase(name, newDatabasePlayer.value);
+        await DatabaseApi.createDatabase(
+          name,
+          Number.parseInt(newDatabasePlayer.value ?? "0") as 0 | 1 | -1
+        );
+        await DatabaseApi.switchToDatabase(name);
         refetchDatabaseInfo.value = true;
       }
     };
@@ -90,6 +89,12 @@ export default defineComponent({
   margin: 0 1rem;
   display: grid;
   gap: 1rem;
+}
+.database {
+  &__create {
+    display: flex;
+    column-gap: 1rem;
+  }
 }
 .databases {
   &__list {

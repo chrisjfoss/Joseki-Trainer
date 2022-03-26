@@ -94,19 +94,3 @@ export const getNewDeck = (
   }
   return transformedPrevDeck === 10 ? session : transformedPrevDeck;
 };
-
-/**
- * Decks:
- * 0: 0259
- * 1: 1360
- * 2: 2471
- * 3: 3582
- * 4: 4693
- * 5: 5704
- * 6: 6815
- * 7: 7926
- * 8: 8037
- * 9: 9148
- * 10: Current
- * 11: Retired
- */

@@ -74,8 +74,8 @@ export default defineComponent({
     const currentMove = computed(() => {
       return movesToTrain.value[0];
     });
-    const currentDatabase = inject("currentDatabase") as Ref<string>;
-    watch(currentDatabase, async () => {
+    const refetchDatabaseInfo = inject("refetchDatabaseInfo") as Ref<string>;
+    watch(refetchDatabaseInfo, async () => {
       movesToTrain.value = await MoveApi.getMovesForCurrentSession();
     });
     onMounted(async () => {
@@ -110,16 +110,13 @@ export default defineComponent({
           rows.value
         );
 
-        if (
-          !boardIsUpdatedFromChild.value ||
-          !BoardUtil.areEqualWithTransformation(board.value, newBoard).equal
-        ) {
+        if (!boardIsUpdatedFromChild.value) {
           currentTransformation.value = getRandomTransformation();
-          board.value = BoardUtil.applyTransformation(
-            newBoard,
-            currentTransformation.value
-          );
         }
+        board.value = BoardUtil.applyTransformation(
+          newBoard,
+          currentTransformation.value
+        );
         player.value = currentPosition.value.player === 1 ? 1 : -1;
         setCandidatePositions(currentPosition.value);
       }

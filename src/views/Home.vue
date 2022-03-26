@@ -31,8 +31,6 @@
     <button @click="getAvailableDatabases()">Get Available Databases</button>
     <button @click="getAllMoves()">Get All Moves</button>
     <button @click="getAllPositions()">Get All Positions</button>
-    <input v-model="dbName" type="text" />
-    <button @click="createDatabase()">Create Database</button>
     <button @click="tenuki()">Tenuki</button>
     <button @click="deletePositions()">Delete current line</button>
   </div>
@@ -103,7 +101,6 @@ export default defineComponent({
     );
 
     const dbPosition: Ref<Position | null> = ref(null);
-    const dbName = ref("");
 
     const setGhostStones = async () => {
       dbPosition.value =
@@ -187,22 +184,50 @@ export default defineComponent({
       }
     };
 
+    const processingMove = ref(false);
     const previousMove = () => {
+      processingMove.value = true;
       if (turn.value >= 1) {
         turn.value--;
         board.value = moveList.value[turn.value].board;
         player.value = moveList.value[turn.value].player === 1 ? -1 : 1;
       }
+      processingMove.value = false;
     };
     const nextMove = () => {
+      processingMove.value = true;
       if (turn.value < moveList.value.length - 1) {
         turn.value++;
         board.value = moveList.value[turn.value].board;
         player.value = moveList.value[turn.value].player === 1 ? -1 : 1;
+        processingMove.value = false;
+      } else if (
+        dbPosition.value &&
+        dbPosition.value?.candidateMoves.length > 0
+      ) {
+        const move: [number, number] = [
+          dbPosition.value.candidateMoves[0].point.x,
+          dbPosition.value.candidateMoves[0].point.y
+        ];
+        board.value = board.value.makeMove(player.value, move);
+        player.value = player.value === 1 ? -1 : 1;
+        moveList.value.push({
+          board: board.value,
+          player: player.value === 1 ? -1 : 1,
+          priorMove: move
+        });
+        turn.value++;
+      } else {
+        processingMove.value = false;
       }
     };
 
+    watch(dbPosition, () => {
+      processingMove.value = false;
+    });
+
     const cycleMove = (event: KeyboardEvent) => {
+      if (processingMove.value) return;
       if (event.key === "ArrowLeft") {
         previousMove();
       } else if (event.key === "ArrowRight") {
@@ -217,11 +242,6 @@ export default defineComponent({
     const getAvailableDatabases = async () => {
       const databases = await DatabaseApi.getAvailableDatabases();
       console.log(databases);
-    };
-
-    const createDatabase = async () => {
-      await DatabaseApi.createDatabase(dbName.value);
-      await updateDatabaseList();
     };
 
     const databases = ref([] as string[]);
@@ -290,8 +310,6 @@ export default defineComponent({
       getAllPositions,
       ghostStones,
       dbPosition,
-      dbName,
-      createDatabase,
       tenuki,
       deletePositions
     };
