@@ -1,0 +1,9 @@
+{
+  "version": "v1",
+  "packages": {
+    "shudan-for-vue": {
+      "signature": "299d15f287f3ea95213344646a4d2ece",
+      "file": true
+    }
+  }
+}
