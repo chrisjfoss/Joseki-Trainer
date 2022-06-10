@@ -9,7 +9,7 @@
 
 <script lang="ts">
 import { defineComponent, onMounted, provide, Ref, ref, watch } from "vue";
-import TheHeader from "./components/Header.vue";
+import TheHeader from "./components/TheHeader.vue";
 
 import { liveQuery } from "dexie";
 import { useObservable } from "@vueuse/rxjs";
