@@ -1,4 +1,4 @@
-import { createGoban } from "shudan-for-vue";
+import { createGoban } from "vue-shudan";
 
 const goban = createGoban();
 
