@@ -3,7 +3,7 @@ import { DatabaseApi } from "@/api";
 import { defineComponent, inject, Ref, ref, watch } from "vue";
 
 export default defineComponent({
-  name: "Header",
+  name: "TheHeader",
   setup() {
     const currentDatabase = inject("currentDatabase") as Ref<string>;
     const refetchDatabaseInfo = inject("refetchDatabaseInfo") as Ref<string>;

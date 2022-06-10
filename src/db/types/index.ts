@@ -1,6 +1,6 @@
-import type { Position } from "./position";
-import type { Player } from "./player";
-import type { Move } from "./move";
+import type { Position } from "./Position";
+import type { Player } from "./Player";
+import type { Move } from "./Move";
 import type { Repository } from "./Repository";
 
 export { Position, Player, Move, Repository };
