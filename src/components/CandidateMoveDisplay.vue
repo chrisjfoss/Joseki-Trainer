@@ -16,6 +16,7 @@
 import { computed, defineComponent } from "vue";
 import * as DbTypes from "@/db/types";
 import { alpha } from "./GoBoard/ShudanPort/helper";
+import { MoveUtil } from "@/utils";
 
 export default defineComponent({
   name: "CandidateMoveDisplay",
@@ -44,7 +45,11 @@ export default defineComponent({
       return `${alpha[vertex.x]}${props.dimensions.rows - vertex.y}`;
     };
     const getMoveDisplay = (candidate: DbTypes.Move, index: number) => {
-      let display = `${index + 1}.${getVertexName(candidate.point)}`;
+      let display = `${index + 1}.`;
+      if (MoveUtil.isTenuki(candidate)) {
+        return `${index + 1}.Tenuki`;
+      }
+      display += getVertexName(candidate.point);
       if (candidate.comments) {
         display += `: ${candidate.comments}`;
       }

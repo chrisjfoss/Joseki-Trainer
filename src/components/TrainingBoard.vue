@@ -9,7 +9,7 @@ import { Position } from "@/db/types";
 import { BoardUtil } from "@/utils";
 
 export default defineComponent({
-  name: "TheTrain",
+  name: "TrainingBoard",
   components: {
     GoBoard
   },

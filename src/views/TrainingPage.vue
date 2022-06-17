@@ -1,7 +1,7 @@
 <template>
   <div id="train-page">
     <div :style="{ width: targetWidth, height: targetWidth }">
-      <TheTrain
+      <TrainingBoard
         v-if="acceptedPosition"
         v-model:player="player"
         v-model:moveList="moveList"
@@ -31,7 +31,7 @@ import {
   watch,
   inject
 } from "vue";
-import TheTrain from "../components/TheTrain.vue";
+import TrainingBoard from "../components/TrainingBoard.vue";
 import TrainingStats from "../components/TrainingStats.vue";
 import { PositionApi, MoveApi, BoardApi } from "@/api";
 import { Move, MoveList } from "@/types";
@@ -44,7 +44,7 @@ import _ from "lodash";
 export default defineComponent({
   name: "TrainingPage",
   components: {
-    TheTrain,
+    TrainingBoard,
     TrainingStats
   },
   setup() {
