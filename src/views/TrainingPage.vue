@@ -1,7 +1,7 @@
 <template>
   <div id="train-page">
     <div :style="{ width: targetWidth, height: targetWidth }">
-      <TheTrain
+      <TrainingBoard
         v-if="acceptedPosition"
         v-model:player="player"
         v-model:moveList="moveList"
@@ -22,16 +22,8 @@
 </template>
 
 <script lang="ts">
-import {
-  defineComponent,
-  onMounted,
-  Ref,
-  ref,
-  computed,
-  watch,
-  inject
-} from "vue";
-import TheTrain from "../components/TheTrain.vue";
+import { defineComponent, Ref, ref, computed, watch, inject } from "vue";
+import TrainingBoard from "../components/TrainingBoard.vue";
 import TrainingStats from "../components/TrainingStats.vue";
 import { PositionApi, MoveApi, BoardApi } from "@/api";
 import { Move, MoveList } from "@/types";
@@ -44,7 +36,7 @@ import _ from "lodash";
 export default defineComponent({
   name: "TrainingPage",
   components: {
-    TheTrain,
+    TrainingBoard,
     TrainingStats
   },
   setup() {
@@ -75,12 +67,19 @@ export default defineComponent({
       return movesToTrain.value[0];
     });
     const refetchDatabaseInfo = inject("refetchDatabaseInfo") as Ref<string>;
-    watch(refetchDatabaseInfo, async () => {
-      movesToTrain.value = await MoveApi.getMovesForCurrentSession();
-    });
-    onMounted(async () => {
-      movesToTrain.value = await MoveApi.getMovesForCurrentSession();
-    });
+    watch(
+      refetchDatabaseInfo,
+      async () => {
+        if (refetchDatabaseInfo.value) {
+          movesToTrain.value =
+            (await MoveApi.getMovesForCurrentSession()) ?? [];
+        }
+      },
+      {
+        immediate: true
+      }
+    );
+
     const interactable = ref(true);
 
     const currentPosition: Ref<DbType.Position | undefined> = ref();

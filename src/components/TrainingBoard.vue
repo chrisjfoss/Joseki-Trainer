@@ -9,7 +9,7 @@ import { Position } from "@/db/types";
 import { BoardUtil } from "@/utils";
 
 export default defineComponent({
-  name: "TheTrain",
+  name: "TrainingBoard",
   components: {
     GoBoard
   },
@@ -138,7 +138,23 @@ export default defineComponent({
         .map(() => Array(props.board.width).fill(null));
     });
 
+    const tenuki = () => {
+      computedMoveList.value.push({
+        ...computedMoveList.value[computedTurn.value],
+        board: props.board,
+        priorMove: [-1, -1],
+        player: computedPlayer.value
+      });
+      computedTurn.value++;
+      computedPlayer.value = (computedPlayer.value * -1) as -1 | 1;
+
+      checkMove({
+        board: props.board
+      });
+    };
+
     return {
+      tenuki,
       checkMove,
       computedPlayer,
       computedMoveList,
@@ -160,6 +176,7 @@ export default defineComponent({
       show-coordinates
       @check-move="checkMove"
     />
+    <button @click="tenuki()">Tenuki</button>
   </div>
 </template>
 <style scoped lang="scss"></style>

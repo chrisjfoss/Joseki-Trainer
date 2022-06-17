@@ -1,7 +1,8 @@
-import Board, { Sign, Vertex } from "@sabaki/go-board";
+import Board, { Sign } from "@sabaki/go-board";
 import * as Matrix from "./matrixUtil";
 import * as Leitner from "./leitner";
 import * as BoardUtil from "./board";
+import * as MoveUtil from "./move";
 import * as PositionUtil from "./position";
 
 class SingletonUtilStorage {
@@ -206,6 +207,7 @@ export {
   Matrix,
   Leitner,
   BoardUtil,
+  MoveUtil,
   PositionUtil,
   getPositionString,
   getAllPositionStrings,

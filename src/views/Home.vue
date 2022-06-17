@@ -56,6 +56,7 @@ import MoveDisplay from "../components/MoveDisplay.vue";
 import { PositionApi, MoveApi, DatabaseApi } from "@/api";
 import { Player, Position } from "@/db/types";
 import CandidateMoveDisplay from "@/components/CandidateMoveDisplay.vue";
+import { MoveUtil } from "@/utils";
 
 export default defineComponent({
   name: "HomePage",
@@ -113,11 +114,13 @@ export default defineComponent({
         .map(() => Array(columns.value).fill(null));
       if (dbPosition.value) {
         dbPosition.value.candidateMoves.forEach((move) => {
-          newGhostStones[move.point.y][move.point.x] = {
-            sign: player.value,
-            type: "interesting",
-            faint: true
-          };
+          if (!MoveUtil.isTenuki(move)) {
+            newGhostStones[move.point.y][move.point.x] = {
+              sign: player.value,
+              type: "interesting",
+              faint: true
+            };
+          }
         });
       }
       ghostStones.value = newGhostStones;
@@ -260,6 +263,12 @@ export default defineComponent({
     });
 
     const tenuki = () => {
+      moveList.value.push({
+        ...moveList.value[turn.value],
+        priorMove: [-1, -1],
+        player: player.value
+      });
+      turn.value++;
       player.value = (player.value * -1) as -1 | 1;
     };
 
