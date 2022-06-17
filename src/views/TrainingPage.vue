@@ -22,15 +22,7 @@
 </template>
 
 <script lang="ts">
-import {
-  defineComponent,
-  onMounted,
-  Ref,
-  ref,
-  computed,
-  watch,
-  inject
-} from "vue";
+import { defineComponent, Ref, ref, computed, watch, inject } from "vue";
 import TrainingBoard from "../components/TrainingBoard.vue";
 import TrainingStats from "../components/TrainingStats.vue";
 import { PositionApi, MoveApi, BoardApi } from "@/api";
@@ -75,12 +67,19 @@ export default defineComponent({
       return movesToTrain.value[0];
     });
     const refetchDatabaseInfo = inject("refetchDatabaseInfo") as Ref<string>;
-    watch(refetchDatabaseInfo, async () => {
-      movesToTrain.value = await MoveApi.getMovesForCurrentSession();
-    });
-    onMounted(async () => {
-      movesToTrain.value = await MoveApi.getMovesForCurrentSession();
-    });
+    watch(
+      refetchDatabaseInfo,
+      async () => {
+        if (refetchDatabaseInfo.value) {
+          movesToTrain.value =
+            (await MoveApi.getMovesForCurrentSession()) ?? [];
+        }
+      },
+      {
+        immediate: true
+      }
+    );
+
     const interactable = ref(true);
 
     const currentPosition: Ref<DbType.Position | undefined> = ref();
