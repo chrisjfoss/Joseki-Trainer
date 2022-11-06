@@ -1,7 +1,25 @@
 <template>
   <div class="database-page">
-    <p>Create a new database</p>
-    <div class="database__create">
+    <section class="databases">
+      <h2 class="databases__header">Databases (Edit & Delete)</h2>
+      <ul class="databases__list">
+        <li
+          v-for="database in databases"
+          :key="database"
+          class="databases__item item"
+        >
+          <span class="item__name">{{ database }}</span>
+          <button class="item__button" @click="exportDb(database)">
+            Export
+          </button>
+          <button class="item__button" @click="deleteDb(database)">
+            Delete
+          </button>
+        </li>
+      </ul>
+    </section>
+    <section class="database__create">
+      <p>Create a new database</p>
       <input
         v-model="newDatabaseName"
         type="text"
@@ -15,24 +33,20 @@
       </select>
 
       <button @click="createDatabase">Create</button>
-    </div>
-    <p>Databases (Edit & Delete)</p>
-    <div class="databases">
-      <div class="databases__list">
-        <ul>
-          <li v-for="database in databases" :key="database">
-            <span>{{ database }}</span>
-            <button @click="deleteDb(database)">Delete</button>
-          </li>
-        </ul>
-      </div>
-    </div>
+    </section>
   </div>
 </template>
 <script lang="ts">
 import { DatabaseApi } from "@/api";
 import { defineComponent, inject, onMounted, ref, watch } from "vue";
 import type { Ref } from "vue";
+
+const apiWindow = window as typeof window & {
+  api: {
+    send: Function;
+    receive: Function;
+  };
+};
 
 export default defineComponent({
   name: "DatabasePage",
@@ -41,6 +55,10 @@ export default defineComponent({
     const databases: Ref<string[]> = ref([]);
 
     const { deleteDatabase, getAvailableDatabases } = DatabaseApi;
+
+    const exportDb = (name: string) => {
+      apiWindow.api.send("export-db-start", name);
+    };
 
     const refetchDatabaseInfo = inject("refetchDatabaseInfo") as Ref<boolean>;
     const deleteDb = async (name: string) => {
@@ -77,6 +95,7 @@ export default defineComponent({
     return {
       databases,
       deleteDb,
+      exportDb,
       createDatabase,
       newDatabaseName,
       newDatabasePlayer
@@ -92,16 +111,43 @@ export default defineComponent({
 }
 .database {
   &__create {
+    background-color: var(--primary);
+    padding: 1rem;
     display: flex;
     column-gap: 1rem;
+    align-items: center;
   }
 }
 .databases {
+  padding: 1rem;
+  background-color: var(--primary);
+  color: var(--text);
+  &__header {
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+  }
   &__list {
-    background: red;
+    padding: 0;
+    margin: 0;
+  }
+  &__item {
+    display: grid;
+    grid-template-columns: 1fr repeat(3, min-content);
+    gap: 1rem;
+    list-style: none;
+    justify-content: space-between;
+    align-items: center;
+    border: 1px solid var(--background);
+    border-bottom: 0;
+
+    &:last-child {
+      border-bottom: 1px solid var(--background);
+    }
+    padding: 0.75rem;
   }
 }
 p {
-  color: white;
+  color: var(--text);
 }
 </style>

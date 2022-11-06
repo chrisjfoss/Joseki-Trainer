@@ -29,7 +29,7 @@
     "v-calendar": "^3.0.0-alpha.6",
     "vue": "^3.0.0",
     "vue-router": "4",
-    "vue-shudan": "^0.1.9"
+    "vue-shudan": "^0.2.0"
   },
   "devDependencies": {
     "@types/electron-devtools-installer": "^2.2.0",

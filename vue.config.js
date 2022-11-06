@@ -6,5 +6,5 @@ module.exports = {
                 additionalData: `@import "@/assets/scss/main.scss";`
             }
         }
-    }
+    },
 };
