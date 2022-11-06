@@ -1,4 +1,4 @@
-# go-joseki-trainer
+# joseki-trainer
 
 A desktop application to help learn Joseki and Fuseki through spaced repetition for the game of Go.
 
