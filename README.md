@@ -3,8 +3,7 @@
 A desktop application to help learn Joseki and Fuseki through spaced repetition for the game of Go.
 
 This application is built on Electron and Vue and is in the early stages of development.
-
-- This project will not run without the package shudan-for-vue, which is a Vue transpilation of the preact project https://github.com/SabakiHQ/Shudan. I will be making this package available soon.
+Currently the focus is on getting the core functionality in place over making the UI look nice.
 
 ## Project setup
 
