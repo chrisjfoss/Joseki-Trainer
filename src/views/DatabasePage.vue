@@ -9,6 +9,9 @@
           class="databases__item item"
         >
           <span class="item__name">{{ database }}</span>
+          <button class="item__button" @click="exportDb(database)">
+            Export
+          </button>
           <button class="item__button" @click="deleteDb(database)">
             Delete
           </button>
@@ -38,6 +41,13 @@ import { DatabaseApi } from "@/api";
 import { defineComponent, inject, onMounted, ref, watch } from "vue";
 import type { Ref } from "vue";
 
+const apiWindow = window as typeof window & {
+  api: {
+    send: Function;
+    receive: Function;
+  };
+};
+
 export default defineComponent({
   name: "DatabasePage",
   setup() {
@@ -45,6 +55,10 @@ export default defineComponent({
     const databases: Ref<string[]> = ref([]);
 
     const { deleteDatabase, getAvailableDatabases } = DatabaseApi;
+
+    const exportDb = (name: string) => {
+      apiWindow.api.send("export-db-start", name);
+    };
 
     const refetchDatabaseInfo = inject("refetchDatabaseInfo") as Ref<boolean>;
     const deleteDb = async (name: string) => {
@@ -81,6 +95,7 @@ export default defineComponent({
     return {
       databases,
       deleteDb,
+      exportDb,
       createDatabase,
       newDatabaseName,
       newDatabasePlayer
@@ -117,16 +132,19 @@ export default defineComponent({
     margin: 0;
   }
   &__item {
-    display: flex;
+    display: grid;
+    grid-template-columns: 1fr repeat(3, min-content);
     gap: 1rem;
     list-style: none;
     justify-content: space-between;
+    align-items: center;
     border: 1px solid var(--background);
     border-bottom: 0;
+
     &:last-child {
       border-bottom: 1px solid var(--background);
     }
-    padding: 0.5rem;
+    padding: 0.75rem;
   }
 }
 p {

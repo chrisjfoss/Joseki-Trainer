@@ -31,11 +31,14 @@ export default defineComponent({
   },
   setup() {
     onMounted(() => {
-      apiWindow.api.receive("export-db", async () => {
-        const buffer = await (await DatabaseApi.exportDatabase()).arrayBuffer();
+      apiWindow.api.receive("export-db", async (args?: string[]) => {
+        const name = args && args.length > 0 ? args[0] : undefined;
+        const buffer = await (
+          await DatabaseApi.exportDatabase(name)
+        ).arrayBuffer();
         apiWindow.api.send("export-db-complete", {
           buffer,
-          name: DatabaseApi.getCurrentDatabaseName()
+          name: name ?? DatabaseApi.getCurrentDatabaseName()
         });
       });
       apiWindow.api.receive(

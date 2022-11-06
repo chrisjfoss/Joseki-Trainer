@@ -1,11 +1,12 @@
 "use strict";
 
-import { app, protocol, BrowserWindow } from "electron";
+import { app, protocol, BrowserWindow, ipcMain } from "electron";
 import { createProtocol } from "vue-cli-plugin-electron-builder/lib";
 import installExtension, { VUEJS3_DEVTOOLS } from "electron-devtools-installer";
 import path from "path";
 
 import "@/setup/menu";
+import { nodeExportDatase } from "./setup/database";
 
 const isDevelopment = process.env.NODE_ENV !== "production";
 declare const __static: string;
@@ -69,6 +70,9 @@ app.on("ready", async () => {
     }
   }
   createWindow();
+  ipcMain.on("export-db-start", (event: Electron.Event, name?: string) => {
+    nodeExportDatase(name);
+  });
 });
 
 // Exit cleanly on request from parent process in development mode.
