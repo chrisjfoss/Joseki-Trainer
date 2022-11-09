@@ -65,7 +65,7 @@ export default defineComponent({
 
     const ghostStoneMap = computed(() => {
       const returnMap =
-        props.ghostStones === []
+        props.ghostStones.length === 0
           ? Array(props.board.height)
               .fill(null)
               .map(() => Array(props.board.width).fill(null))

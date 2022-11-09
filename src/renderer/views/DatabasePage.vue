@@ -40,6 +40,7 @@
 import { DatabaseApi } from "@/database";
 import { defineComponent, inject, onMounted, ref, watch } from "vue";
 import type { Ref } from "vue";
+import { EVENTS } from "@common/events";
 
 const apiWindow = window as typeof window & {
   api: {
@@ -57,7 +58,7 @@ export default defineComponent({
     const { deleteDatabase, getAvailableDatabases } = DatabaseApi;
 
     const exportDb = (name: string) => {
-      apiWindow.api.send("export-db-start", name);
+      apiWindow.api.send(EVENTS.exportDbStart, name);
     };
 
     const refetchDatabaseInfo = inject("refetchDatabaseInfo") as Ref<boolean>;

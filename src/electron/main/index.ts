@@ -15,6 +15,8 @@ process.env.PUBLIC = app.isPackaged ? process.env.DIST : join(process.env.DIST_E
 import { app, BrowserWindow, shell, ipcMain } from 'electron'
 import { release } from 'os'
 import { join } from 'path'
+import { nodeExportDatase } from '../utils/database'
+import { EVENTS } from '@common/events'
 
 require("./menu");
 
@@ -71,7 +73,13 @@ async function createWindow() {
   })
 }
 
-app.whenReady().then(createWindow)
+app.whenReady().then(() => {
+  createWindow();
+
+  ipcMain.on(EVENTS.exportDbStart, (event, name?: string) => {
+    nodeExportDatase(name);
+  });
+})
 
 app.on('window-all-closed', () => {
   win = null

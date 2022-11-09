@@ -29,11 +29,11 @@ const template = [
     submenu: [
       {
         label: "Export Current Database",
-        click: nodeExportDatase
+        click: () => nodeExportDatase(),
       },
       {
         label: "Import Database(s)",
-        click: nodeImportDatabase
+        click: () => nodeImportDatabase(),
       },
       { role: isMac ? "close" : "quit" }
     ]

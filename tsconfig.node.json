@@ -10,12 +10,15 @@
     "baseUrl": "./",
     "paths": {
       "@/*": [
-        "src/*"
+        "src/renderer/*"
+      ],
+      "@common/*": [
+        "src/common/*"
       ],
     }
   },
   "include": [
     "package.json",
-    "electron"
+    "src/electron",
   ]
 }

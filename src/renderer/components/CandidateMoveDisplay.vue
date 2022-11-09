@@ -14,7 +14,7 @@
 </template>
 <script lang="ts">
 import { computed, defineComponent } from "vue";
-import * as DbTypes from "@/db/types";
+import { type DatabaseTypes } from "@/database";
 import { alpha } from "./GoBoard/ShudanPort/helper";
 import { MoveUtil } from "@/utils";
 
@@ -22,7 +22,7 @@ export default defineComponent({
   name: "CandidateMoveDisplay",
   props: {
     position: {
-      type: Object as () => DbTypes.Position,
+      type: Object as () => DatabaseTypes.Position,
       required: false,
       default: null
     },
@@ -44,7 +44,7 @@ export default defineComponent({
       }
       return `${alpha[vertex.x]}${props.dimensions.rows - vertex.y}`;
     };
-    const getMoveDisplay = (candidate: DbTypes.Move, index: number) => {
+    const getMoveDisplay = (candidate: DatabaseTypes.Move, index: number) => {
       let display = `${index + 1}.`;
       if (MoveUtil.isTenuki(candidate)) {
         return `${index + 1}.Tenuki`;

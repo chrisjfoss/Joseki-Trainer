@@ -1,4 +1,4 @@
-import { Player, Position } from "@/db/types";
+import { type DatabaseTypes } from "@/database";
 import { getBoard, addBoard } from "./board";
 import {
   getAllPositionStrings,
@@ -39,7 +39,7 @@ export const getPositionById = async (
 
 export const getOriginalPositionFromBoard = async (
   board: GoBoard,
-  player: Player,
+  player: DatabaseTypes.Player,
   dbName?: string
 ) => {
   const db = await DatabaseApi.getDatabaseRepository(dbName);
@@ -56,7 +56,7 @@ export const getOriginalPositionFromBoard = async (
 
     return returnValue
       .filter((position) => {
-        const { ko, player: nextPlayer } = position as Position;
+        const { ko, player: nextPlayer } = position;
         const transformation = getAppliedTransformation(
           position.position,
           board
@@ -80,7 +80,7 @@ export const getOriginalPositionFromBoard = async (
 
 export const getPositionFromBoard = async (
   board: GoBoard,
-  player: Player,
+  player: DatabaseTypes.Player,
   dbName?: string
 ) => {
   const dbPosition = await getOriginalPositionFromBoard(board, player, dbName);
@@ -121,11 +121,11 @@ export const getPositionFromBoard = async (
   return dbPosition;
 };
 
-export const savePosition = async (board: GoBoard, player: Player) => {
+export const savePosition = async (board: GoBoard, player: DatabaseTypes.Player) => {
   const dbBoard = await getBoard(board.width, board.height);
   // Create board if it doesn't exist
 
-  const boardId = dbBoard?.id ?? (await addBoard(board.width, board.height));
+  const boardId = dbBoard?.id ?? (await addBoard(board.width, board.height)) as number;
 
   const { original: originalString, ...positionStrings } =
     getAllPositionStrings(board);
@@ -144,9 +144,9 @@ export const savePosition = async (board: GoBoard, player: Player) => {
 };
 
 const addPosition = async (
-  boardId: IndexableType,
+  boardId: number,
   positionString: string,
-  player: number,
+  player: DatabaseTypes.Player,
   ko: Vertex
 ) => {
   const db = await DatabaseApi.getDatabaseRepository();
@@ -162,7 +162,7 @@ const addPosition = async (
     evaluation: "",
     tag: "",
     candidateMoves: []
-  } as Position);
+  });
 };
 
 export const updatePositionData = async (

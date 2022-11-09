@@ -1,5 +1,5 @@
 import { Vertex } from "@/components/GoBoard/ShudanPort/types";
-import { Position } from "@/db/types";
+import { type DatabaseTypes } from "@/database";
 import GoBoard, { Sign, SignMap } from "@sabaki/go-board";
 import _ from "lodash";
 import { getAllPositionStrings, getRelativeTransformation, Matrix } from ".";
@@ -9,7 +9,7 @@ interface GoBoardWithKo extends GoBoard {
 }
 
 export const getBoardFromPosition = (
-  position: Position,
+  position: DatabaseTypes.Position,
   width: number,
   height: number
 ): GoBoard => {
@@ -23,7 +23,7 @@ export const getBoardFromPosition = (
 };
 
 export const getSignMapFromPosition = (
-  position: Position,
+  position: DatabaseTypes.Position,
   width: number,
   height: number
 ): SignMap => {

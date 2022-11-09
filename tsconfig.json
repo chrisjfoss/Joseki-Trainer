@@ -12,17 +12,18 @@
     "strict": true,
     "paths": {
       "@/*": [
-        "src/*"
+        "src/renderer/*"
       ],
-      "@electron/*": [
-        "electron/*"
+      "@common/*": [
+        "src/common/*"
       ],
     },
     "allowSyntheticDefaultImports": true,
     "skipLibCheck": true
   },
   "include": [
-    "src"
+    "src/renderer",
+    "src/common"
   ],
   "references": [
     {

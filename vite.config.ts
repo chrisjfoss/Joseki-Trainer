@@ -2,7 +2,7 @@ import { rmSync } from 'fs';
 import { defineConfig } from 'vite';
 import vue from '@vitejs/plugin-vue';
 import electron from 'vite-electron-plugin';
-import { customStart, loadViteEnv } from 'vite-electron-plugin/plugin';
+import { alias, customStart, loadViteEnv } from 'vite-electron-plugin/plugin';
 import renderer from 'vite-plugin-electron-renderer';
 import pkg from './package.json';
 import path from 'path';
@@ -13,13 +13,16 @@ rmSync('dist-electron', { recursive: true, force: true });
 export default defineConfig({
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, './src'),
+      '@common': path.resolve(__dirname, 'src/common'),
+      '@': path.resolve(__dirname, 'src/renderer'),
     }
   },
   plugins: [
     vue(),
     electron({
-      include: ['electron'],
+      root: 'src',
+      include: ['electron', 'common'],
+      outDir: '../dist-electron',
       transformOptions: {
         sourcemap: !!process.env.VSCODE_DEBUG,
       },
@@ -27,11 +30,16 @@ export default defineConfig({
         ...(process.env.VSCODE_DEBUG
           ? [
             // Will start Electron via VSCode Debug
-            customStart(debounce(() => console.log(/* For `.vscode/.debug.script.mjs` */'[startup] Electron App'))),
+            customStart(() => debounce(() => console.log(/* For `.vscode/.debug.script.mjs` */'[startup] Electron App'))),
           ]
           : []),
           // Allow use `import.meta.env.VITE_SOME_KEY` in Electron-Main
         loadViteEnv(),
+        alias([
+          { find: '@electron', replacement: path.join(__dirname, 'src/electron/')},
+          { find: '@common', replacement: path.join(__dirname, 'src/common/')},
+          { find: '@', replacement: path.join(__dirname, 'src/renderer/')},
+        ])
       ],
     }),
     // Use Node.js API in the Renderer-process
