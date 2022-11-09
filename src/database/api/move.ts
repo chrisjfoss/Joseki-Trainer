@@ -1,6 +1,6 @@
 import { Training } from "@/constants";
-import { Move, Player, Position } from "@/db/types";
-import { getAppliedTransformation, Leitner, Matrix } from "@/utils";
+import type { DatabaseTypes } from "@/database";
+import { getAppliedTransformation, Leitner, Matrix, PlayerUtil } from "@/utils";
 import { getVerticeTransformation } from "@/utils/matrixUtil";
 import GoBoard, { Vertex } from "@sabaki/go-board";
 import type { IndexableType } from "dexie";
@@ -79,7 +79,7 @@ export const getMovesForCurrentSession = async (dbName?: string) => {
       );
     })
     .toArray();
-  const toReturn = [] as Move[];
+  const toReturn = [] as DatabaseTypes.Move[];
   for (const move of moves) {
     const position = await PositionApi.getPositionById(move.positionId);
     if (position?.player == playerFocus || playerFocus == 0) {
@@ -181,22 +181,22 @@ export const updateMoveComment = async (moveId: number, comment: string) => {
 export const saveMove = async (
   vertex: Vertex,
   board: GoBoard,
-  player: Player,
+  player: DatabaseTypes.Player,
   previousBoard: GoBoard
 ) => {
   const db = await DatabaseApi.getDatabaseRepository();
   // CURRENT POSITION - after move //
   const dbPosition = await getPositionFromBoard(board, player);
-  const positionId: IndexableType | undefined =
+  const positionId =
     dbPosition?.id ?? (await savePosition(board, player));
 
   // PREVIOUS POSITION - prior to move //
-  const previousDbPosition: Position | undefined = previousBoard
-    ? await getOriginalPositionFromBoard(previousBoard, (player * -1) as Player)
+  const previousDbPosition = previousBoard
+    ? await getOriginalPositionFromBoard(previousBoard, PlayerUtil.getOtherPlayer(player))
     : undefined;
-  const previousPositionId: IndexableType =
+  const previousPositionId =
     previousDbPosition?.id ??
-    (await savePosition(previousBoard, (player * -1) as Player));
+    (await savePosition(previousBoard, PlayerUtil.getOtherPlayer(player)));
 
   const previousTransformation = previousDbPosition
     ? getAppliedTransformation(previousDbPosition.position, previousBoard)
@@ -212,7 +212,7 @@ export const saveMove = async (
 
   const dbMove = await db.moves
     .where("previousPositionId")
-    .equals(previousPositionId as IndexableType)
+    .equals(previousPositionId)
     .and((move) => move.positionId === positionId)
     .first();
 
@@ -220,7 +220,7 @@ export const saveMove = async (
     dbMove?.id ??
     (await addMove(
       transformedMove,
-      positionId as IndexableType,
+      positionId,
       previousPositionId
     ));
 

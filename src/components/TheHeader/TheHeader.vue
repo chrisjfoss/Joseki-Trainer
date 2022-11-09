@@ -1,5 +1,5 @@
 <script lang="ts">
-import { DatabaseApi } from "@/api";
+import { DatabaseApi } from "@/database";
 import { defineComponent, inject, Ref, ref, watch } from "vue";
 
 export default defineComponent({

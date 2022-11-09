@@ -1,4 +1,4 @@
-import type { Player, Move } from "./";
+import type { Player, Move } from ".";
 
 export interface Position {
   id?: number;

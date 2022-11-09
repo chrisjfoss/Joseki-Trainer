@@ -1,7 +1,7 @@
-import TrainingPage from "../views/TrainingPage.vue";
-import StatisticsPage from "../views/StatisticsPage.vue";
-import DatabasePage from "../views/DatabasePage.vue";
-import App from "../views/Home.vue";
+import TrainingPage from "@/views/TrainingPage.vue";
+import StatisticsPage from "@/views/StatisticsPage.vue";
+import DatabasePage from "@/views/DatabasePage.vue";
+import App from "@/views/Home.vue";
 
 import {
   createRouter,
@@ -29,7 +29,7 @@ const routes = [
 ];
 
 const router = createRouter({
-  history: process.env.IS_ELECTRON
+  history: navigator.userAgent.toLowerCase().indexOf(' electron/') > -1
     ? createWebHashHistory()
     : createWebHistory(),
   routes

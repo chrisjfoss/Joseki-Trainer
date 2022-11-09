@@ -1,5 +1,5 @@
 import { app, BrowserWindow, ipcMain, Menu } from "electron";
-import { FileUtil } from "@/background/utils";
+import { FileUtil } from "electron/utils";
 
 const isMac = process.platform === "darwin";
 

@@ -5,7 +5,7 @@ import Board from "@sabaki/go-board";
 import GoBoard from "./GoBoard.vue";
 import { MoveList } from "@/types";
 import { Training } from "@/constants";
-import { Position } from "@/db/types";
+import type { DatabaseTypes } from "@/database";
 import { BoardUtil } from "@/utils";
 
 export default defineComponent({
@@ -20,12 +20,12 @@ export default defineComponent({
       default: "100%"
     },
     candidatePositions: {
-      type: Array as PropType<Position[]>,
+      type: Array as PropType<DatabaseTypes.Position[]>,
       required: false,
       default: () => []
     },
     acceptedPosition: {
-      type: Object as PropType<Position>,
+      type: Object as PropType<DatabaseTypes.Position>,
       required: true
     },
     board: {

@@ -1,4 +1,4 @@
-import { db } from "../db";
+import { db } from "../core";
 export const getBoardFromId = async (id: number) => {
   const board = await db.boardDimensions.get(id);
   return board;

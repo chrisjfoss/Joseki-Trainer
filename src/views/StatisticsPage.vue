@@ -22,7 +22,7 @@
 </template>
 <script lang="ts">
 import { defineComponent, inject, onMounted, Ref, ref, watch } from "vue";
-import { MoveApi } from "@/api";
+import { MoveApi } from "@/database";
 
 export default defineComponent({
   name: "StatisticsPage",

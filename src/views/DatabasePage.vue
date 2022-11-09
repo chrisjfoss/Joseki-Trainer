@@ -30,7 +30,7 @@
   </div>
 </template>
 <script lang="ts">
-import { DatabaseApi } from "@/api";
+import { DatabaseApi } from "@/database";
 import { defineComponent, inject, onMounted, ref, watch } from "vue";
 import type { Ref } from "vue";
 

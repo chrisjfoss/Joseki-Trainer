@@ -25,9 +25,9 @@
 import { defineComponent, Ref, ref, computed, watch, inject } from "vue";
 import TrainingBoard from "../components/TrainingBoard.vue";
 import TrainingStats from "../components/TrainingStats.vue";
-import { PositionApi, MoveApi, BoardApi } from "@/api";
+import { PositionApi, MoveApi, BoardApi } from "@/database";
 import { Move, MoveList } from "@/types";
-import * as DbType from "@/db/types";
+import { type DatabaseTypes } from "@/database";
 import Board from "@sabaki/go-board";
 import { Training } from "@/constants";
 import { BoardUtil, getRandomTransformation, Matrix } from "@/utils";
@@ -56,13 +56,13 @@ export default defineComponent({
     const columns = ref(19);
     const waitBetweenMoves = ref(1000);
 
-    const candidatePositions: Ref<DbType.Position[]> = ref([]);
+    const candidatePositions: Ref<DatabaseTypes.Position[]> = ref([]);
     const board = ref(Board.fromDimensions(rows.value, columns.value));
     const player: Ref<1 | -1> = ref(1);
     const turn: Ref<number> = ref(0);
     const currentTransformation = ref(Matrix.Transformation.original);
 
-    const movesToTrain: Ref<DbType.Move[]> = ref([]);
+    const movesToTrain: Ref<DatabaseTypes.Move[]> = ref([]);
     const currentMove = computed(() => {
       return movesToTrain.value[0];
     });
@@ -82,8 +82,8 @@ export default defineComponent({
 
     const interactable = ref(true);
 
-    const currentPosition: Ref<DbType.Position | undefined> = ref();
-    const acceptedPosition: Ref<DbType.Position | undefined> = ref();
+    const currentPosition: Ref<DatabaseTypes.Position | undefined> = ref();
+    const acceptedPosition: Ref<DatabaseTypes.Position | undefined> = ref();
 
     watch(currentMove, async () => {
       currentPosition.value = await PositionApi.getPositionById(
@@ -121,7 +121,7 @@ export default defineComponent({
       }
     });
 
-    const setCandidatePositions = async (position: DbType.Position) => {
+    const setCandidatePositions = async (position: DatabaseTypes.Position) => {
       const asyncCandidates = position.candidateMoves.map(async (move) => {
         return await PositionApi.getPositionById(move.positionId);
       });
@@ -129,7 +129,7 @@ export default defineComponent({
       const filteredCandidates = awaitedCandidates.filter(
         (candidate) =>
           candidate !== undefined && candidate.id !== currentMove.value.id
-      ) as DbType.Position[];
+      ) as DatabaseTypes.Position[];
       candidatePositions.value = filteredCandidates;
     };
 

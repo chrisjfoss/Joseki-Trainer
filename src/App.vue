@@ -9,13 +9,11 @@
 
 <script lang="ts">
 import { defineComponent, onMounted, provide, Ref, ref, watch } from "vue";
-import TheHeader from "./components/TheHeader.vue";
+import TheHeader from "@/components/TheHeader";
 
 import { liveQuery } from "dexie";
 import { useObservable } from "@vueuse/rxjs";
-import { repositoryDb } from "./db";
-import { switchToDatabase } from "./api/database";
-import { DatabaseApi } from "./api";
+import { DatabaseCore, DatabaseApi } from "./database";
 
 const apiWindow = window as typeof window & {
   api: {
@@ -51,7 +49,7 @@ export default defineComponent({
     });
     const readonlyActiveDatabase = useObservable(
       liveQuery(async () => {
-        const repo = await repositoryDb.activeRepository.toArray();
+        const repo = await DatabaseCore.repositoryDb.activeRepository.toArray();
         if (repo.length > 0) {
           const name = repo[0].name;
           return name;
@@ -66,7 +64,7 @@ export default defineComponent({
     });
     watch(currentDatabase, async () => {
       refetchDatabaseInfo.value = false;
-      await switchToDatabase(currentDatabase.value as string);
+      await DatabaseApi.switchToDatabase(currentDatabase.value as string);
       refetchDatabaseInfo.value = true;
     });
     // This is the value to change

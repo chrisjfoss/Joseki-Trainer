@@ -1,7 +1,6 @@
-import { DatabaseApi } from "@/api";
 import Dexie, { Table } from "dexie";
-import type { Move, Position, Repository } from "./types";
-import { BoardDimension } from "./types/BoardDimension";
+import type { Move, Position, Repository } from "../types";
+import { BoardDimension } from "../types/BoardDimension";
 
 export class RepositoryManagerDatabase extends Dexie {
   repositories!: Table<Repository>;

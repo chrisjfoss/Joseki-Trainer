@@ -4,6 +4,7 @@ import * as Leitner from "./leitner";
 import * as BoardUtil from "./board";
 import * as MoveUtil from "./move";
 import * as PositionUtil from "./position";
+import * as PlayerUtil from "./player";
 
 class SingletonUtilStorage {
   public static storedBoard: Board;
@@ -209,6 +210,7 @@ export {
   BoardUtil,
   MoveUtil,
   PositionUtil,
+  PlayerUtil,
   getPositionString,
   getAllPositionStrings,
   getPositionStringForTransformation,

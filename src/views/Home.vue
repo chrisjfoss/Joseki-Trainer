@@ -53,10 +53,9 @@ import Board from "@sabaki/go-board";
 import type { MoveList, Move } from "../types";
 import MoveDisplay from "../components/MoveDisplay.vue";
 
-import { PositionApi, MoveApi, DatabaseApi } from "@/api";
-import { Player, Position } from "@/db/types";
+import { PositionApi, MoveApi, DatabaseApi, type DatabaseTypes } from "@/database";
 import CandidateMoveDisplay from "@/components/CandidateMoveDisplay.vue";
-import { MoveUtil } from "@/utils";
+import { MoveUtil, PlayerUtil } from "@/utils";
 
 export default defineComponent({
   name: "HomePage",
@@ -101,7 +100,7 @@ export default defineComponent({
         .map(() => Array(columns.value).fill(null))
     );
 
-    const dbPosition: Ref<Position | null> = ref(null);
+    const dbPosition: Ref<DatabaseTypes.Position | null> = ref(null);
 
     const setGhostStones = async () => {
       dbPosition.value =
@@ -150,7 +149,7 @@ export default defineComponent({
           await MoveApi.saveMove(
             move.priorMove,
             move.board,
-            (move.player * -1) as Player,
+            PlayerUtil.getOtherPlayer(move.player),
             priorBoard
           );
         }
