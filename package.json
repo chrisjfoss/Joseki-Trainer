@@ -4,7 +4,6 @@
   "private": true,
   "author": "Chris Foss <chrisjfoss@gmail.com>",
   "license": "MIT",
-  
   "main": "dist-electron/main/index.js",
   "scripts": {
     "dev": "vite",
