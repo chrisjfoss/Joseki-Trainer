@@ -1,5 +1,5 @@
-import { app, BrowserWindow, ipcMain, Menu } from "electron";
-import { FileUtil } from "electron/utils";
+import { app, Menu } from "electron";
+import { nodeExportDatase, nodeImportDatabase } from "~/utils/database";
 
 const isMac = process.platform === "darwin";
 
@@ -29,31 +29,11 @@ const template = [
     submenu: [
       {
         label: "Export Current Database",
-        click: async () => {
-          const win = BrowserWindow.getFocusedWindow();
-          if (win) {
-            win.webContents.send("export-db");
-            ipcMain.once(
-              "export-db-complete",
-              (
-                event: Electron.Event,
-                { buffer, name }: { buffer: ArrayBuffer; name: string }
-              ) => {
-                FileUtil.saveBufferToFile(buffer, name);
-              }
-            );
-          }
-        }
+        click: nodeExportDatase
       },
       {
         label: "Import Database(s)",
-        click: async () => {
-          const win = BrowserWindow.getFocusedWindow();
-          if (win) {
-            const files = await FileUtil.openDbFiles();
-            win.webContents.send("import-db", files);
-          }
-        }
+        click: nodeImportDatabase
       },
       { role: isMac ? "close" : "quit" }
     ]

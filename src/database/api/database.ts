@@ -35,6 +35,21 @@ export const createDatabase = async (
   return false;
 };
 
+export const renameDatabase = async (
+  oldName: string,
+  newName: string
+): Promise<boolean> => {
+  const newDatabase = await getDatabaseByName(newName);
+  if (newDatabase) {
+    throw new Error("Name already taken");
+  }
+  const oldDb = await exportDatabase(oldName);
+  await importDatabase(newName, oldDb);
+  await deleteDatabase(oldName);
+
+  return true;
+};
+
 export const getCurrentDatabaseName = () => {
   return DatabaseCore.db.name;
 };
