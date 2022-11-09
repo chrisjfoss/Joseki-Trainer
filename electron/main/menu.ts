@@ -1,5 +1,5 @@
 import { app, Menu } from "electron";
-import { nodeExportDatase, nodeImportDatabase } from "~/utils/database";
+import { nodeExportDatase, nodeImportDatabase } from "%/utils/database";
 
 const isMac = process.platform === "darwin";
 
