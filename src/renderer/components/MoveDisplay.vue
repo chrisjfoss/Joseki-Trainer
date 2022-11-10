@@ -94,8 +94,8 @@ export default defineComponent({
 });
 </script>
 <template>
-  <div :style="{ 'max-height': maxHeight }" @mouseleave="emitMouseLeaveAll">
-    <ul class="move-list">
+  <div dark :style="{ 'max-height': maxHeight }" @mouseleave="emitMouseLeaveAll">
+    <q-card tag="ul" class="move-list">
       <span v-for="(move, i) in filteredMoves" :key="i">
         <li v-if="move.priorMove" class="move">
           <span>{{ i + 1 }}.</span>
@@ -117,7 +117,7 @@ export default defineComponent({
           >
         </li>
       </span>
-    </ul>
+    </q-card>
   </div>
 </template>
 <style scoped lang="scss">
@@ -129,9 +129,9 @@ export default defineComponent({
   grid-template-columns: repeat(2, max-content);
   row-gap: 0.5rem;
   column-gap: 1rem;
-  background-color: var(--primary);
   margin: auto;
   height: 100%;
+  background-color: var(--primary);
   color: var(--text);
   align-content: baseline;
   overflow-y: auto;

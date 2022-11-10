@@ -6,6 +6,7 @@ import { alias, customStart, loadViteEnv } from 'vite-electron-plugin/plugin';
 import renderer from 'vite-plugin-electron-renderer';
 import pkg from './package.json';
 import path from 'path';
+import { quasar, transformAssetUrls } from '@quasar/vite-plugin'
 
 rmSync('dist-electron', { recursive: true, force: true });
 
@@ -18,7 +19,9 @@ export default defineConfig({
     }
   },
   plugins: [
-    vue(),
+    vue({
+      template: { transformAssetUrls }
+    }),
     electron({
       root: 'src',
       include: ['electron', 'common'],
@@ -42,6 +45,7 @@ export default defineConfig({
         ])
       ],
     }),
+    quasar(),
     // Use Node.js API in the Renderer-process
     renderer({
       nodeIntegration: true,

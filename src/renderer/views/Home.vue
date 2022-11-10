@@ -1,38 +1,38 @@
 <template>
-  <div class="main" @keyup.up="previousMove" @keyup.down="nextMove">
-    <div class="main__sidebar">
+  <div class="page" @keyup.up="previousMove" @keyup.down="nextMove">
+    <div class="page__sidebar">
       <MoveDisplay
-        :moves="moveList"
-        :turn="turn"
-        :board-height="board.height"
-        @mouseenter="setHoveredBoard"
-        @mouseleave:all="setHoveredBoard(null)"
-        @click="jumpToPosition"
+      :moves="moveList"
+      :turn="turn"
+      :board-height="board.height"
+      @mouseenter="setHoveredBoard"
+      @mouseleave:all="setHoveredBoard(null)"
+      @click="jumpToPosition"
       />
       <CandidateMoveDisplay
-        :position="dbPosition ?? undefined"
-        :dimensions="{ rows: board.height, columns: board.width }"
+      :position="dbPosition ?? undefined"
+      :dimensions="{ rows: board.height, columns: board.width }"
       />
     </div>
-    <GoBoard
-      v-model:player="player"
-      v-model:moveList="moveList"
-      v-model:turn="turn"
-      class="board"
-      :board="displayBoard"
-      show-coordinates
-      :ghost-stones="ghostStones"
-      width="100%"
-      @update:board="(val) => (board = val)"
-    />
-    <button @click="saveMoves()">Save</button>
-    <button @click="getPosition()">Get Current Position</button>
-    <button @click="deleteDatabase()">Delete Database</button>
-    <button @click="getAvailableDatabases()">Get Available Databases</button>
-    <button @click="getAllMoves()">Get All Moves</button>
-    <button @click="getAllPositions()">Get All Positions</button>
-    <button @click="tenuki()">Tenuki</button>
-    <button @click="deletePositions()">Delete current line</button>
+    <span class="page__main">
+      <GoBoard
+        v-model:player="player"
+        v-model:moveList="moveList"
+        v-model:turn="turn"
+        class="board"
+        :board="displayBoard"
+        show-coordinates
+        :ghost-stones="ghostStones"
+        width="100%"
+        @update:board="(val) => (board = val)"
+      />
+      <span class="page__actions">
+        <q-btn no-caps class="actions__button" text-color="accent" color="negative" @click="deletePositions()">Delete current line</q-btn>
+        <q-btn no-caps class="actions__button" text-color="accent" color="primary" @click="saveMoves()">Save</q-btn>
+        <q-btn no-caps class="actions__button actions__button--tenuki" text-color="accent" color="primary" @click="tenuki()">Tenuki</q-btn>
+      </span>
+    </span>
+
   </div>
 </template>
 
@@ -327,17 +327,43 @@ export default defineComponent({
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
-.main {
+.page {
   margin: 0 1rem;
   display: grid;
-  grid-template-columns: 23rem 1fr;
+  gap: 1rem;
+  @include mixin-for-tablet-landscape-up {
+    grid-template-columns: 23rem 1fr;
+  }
   &__sidebar {
     display: grid;
+    gap: 1rem;
     grid-template-rows: minmax(250px, 1fr) minmax(250px, min-content);
-    row-gap: 1rem;
+    
+    @include mixin-for-tablet-portrait-up {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    
+    @include mixin-for-tablet-landscape-up {
+      grid-template-columns: 1fr;
+      grid-column: 1;
+      grid-row: 1 / -1;
+    }
+  }
+  &__main {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    grid-row: 1;
+  }
+  &__actions {
+    grid-column: 1 / -1;
+    max-width: 800px;
+    display: grid;
+    grid-template-columns: repeat(2, max-content) 1fr max-content;
+    gap: 1rem;
   }
 }
-.board {
-  justify-self: center;
+.actions__button--tenuki {
+  grid-column: -1;
 }
 </style>

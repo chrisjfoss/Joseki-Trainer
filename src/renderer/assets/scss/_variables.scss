@@ -5,4 +5,13 @@
   --warning: #dbad6a;
   --success: #a0d468;
   --error: #c03221;
+  --info: #31CCEC;
+
+  --q-primary: var(--primary);
+  --q-secondary: var(--background);
+  --q-accent: var(--text);
+  --q-warning: var(--warning);
+  --q-positive: var(--success);
+  --q-negative: var(--error);
+  --q-info: var(--info);
 }

@@ -1,5 +1,6 @@
-@use "_mixins" as mixins;
-@import "_variables";
+@forward "_mixins" as mixin-*;
+@forward "_variables";
+
 
 // CSS Reset
 /* Box sizing rules */

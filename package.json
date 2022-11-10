@@ -13,16 +13,20 @@
     "node": "^14.18.0 || >=16.0.0"
   },
   "dependencies": {
+    "@quasar/extras": "^1.15.5",
     "@sabaki/go-board": "^1.4.3",
     "@vueuse/rxjs": "^9.5.0",
     "dexie": "^3.2.2",
     "dexie-export-import": "^1.0.3",
     "lodash": "^4.17.21",
+    "quasar": "^2.10.1",
     "rxjs": "^7.5.5",
     "vue-router": "4",
-    "vue-shudan": "^0.2.0"
+    "vue-shudan": "^0.2.0",
+    "sass": "1.32.12"
   },
   "devDependencies": {
+    "@quasar/vite-plugin": "^1.2.3",
     "@types/lodash": "^4.14.188",
     "@vitejs/plugin-vue": "^3.1.2",
     "electron": "^21.1.0",

@@ -1,7 +1,10 @@
 <template>
-  <div id="candidates-display">
-    <h1>Candidate Moves</h1>
-    <div class="candidates-display__moves">
+  <q-card dark id="candidates-display" class="candidates-display">
+    <q-card-section class="candidates-display__header">
+      Candidate Moves
+    </q-card-section>
+  <q-separator color="accent" dark inset/>
+    <q-card-section class="candidates-display__moves">
       <div
         v-for="(candidate, i) in candidates"
         :key="i"
@@ -9,8 +12,8 @@
       >
         {{ getMoveDisplay(candidate, i) }}
       </div>
-    </div>
-  </div>
+    </q-card-section>
+  </q-card>
 </template>
 <script lang="ts">
 import { computed, defineComponent } from "vue";
@@ -63,8 +66,8 @@ export default defineComponent({
 });
 </script>
 <style lang="scss" scoped>
-#candidates-display {
-  padding: 1rem;
+.candidates-display {
+  padding: 0;
   background-color: var(--primary);
   color: var(--text);
 
@@ -72,12 +75,13 @@ export default defineComponent({
     display: grid;
     gap: 1rem;
   }
-  h1 {
+  &__header {
     font-size: 1.5rem;
+    padding: 1rem;
     font-weight: normal;
     text-align: center;
     margin: 0;
-    border-bottom: 1px solid var(--text);
+    // border-bottom: 1px solid var(--text);
   }
 }
 </style>
