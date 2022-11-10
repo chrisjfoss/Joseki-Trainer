@@ -81,7 +81,6 @@ export default defineComponent({
     font-weight: normal;
     text-align: center;
     margin: 0;
-    // border-bottom: 1px solid var(--text);
   }
 }
 </style>
