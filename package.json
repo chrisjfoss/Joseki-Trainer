@@ -7,7 +7,8 @@
   "main": "dist-electron/electron/main/index.js",
   "scripts": {
     "dev": "vite",
-    "build": "vue-tsc --noEmit && vite build && electron-builder"
+    "build": "vue-tsc --noEmit && vite build && electron-builder",
+    "lint": "eslint --fix ."
   },
   "engines": {
     "node": "^14.18.0 || >=16.0.0"
@@ -21,16 +22,26 @@
     "lodash": "^4.17.21",
     "quasar": "^2.10.1",
     "rxjs": "^7.5.5",
+    "sass": "1.32.12",
     "vue-router": "4",
-    "vue-shudan": "^0.2.0",
-    "sass": "1.32.12"
+    "vue-shudan": "^0.2.0"
   },
   "devDependencies": {
     "@quasar/vite-plugin": "^1.2.3",
     "@types/lodash": "^4.14.188",
+    "@typescript-eslint/eslint-plugin": "^5.42.1",
+    "@typescript-eslint/parser": "^5.42.1",
     "@vitejs/plugin-vue": "^3.1.2",
-    "electron": "^21.1.0",
+    "electron": "^21.2.3",
     "electron-builder": "^23.3.3",
+    "eslint": "^8.27.0",
+    "eslint-config-google": "^0.14.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-import-resolver-alias": "^1.1.2",
+    "eslint-import-resolver-typescript": "^3.5.2",
+    "eslint-plugin-import": "^2.26.0",
+    "eslint-plugin-vue": "^9.7.0",
+    "eslint-plugin-vuejs-accessibility": "^2.0.0",
     "typescript": "^4.8.4",
     "vite": "^3.2.2",
     "vite-electron-plugin": "^0.5.1",

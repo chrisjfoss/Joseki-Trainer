@@ -1,0 +1,6 @@
+dist-electron
+.vscode
+dist
+node_modules
+public
+release
