@@ -127,7 +127,7 @@ export const savePosition = async (board: GoBoard, player: DatabaseTypes.Player)
 
   const boardId = dbBoard?.id ?? (await addBoard(board.width, board.height)) as number;
 
-  const { original: originalString, ...positionStrings } =
+  const { original: originalString } =
     getAllPositionStrings(board);
 
   const dbPosition = await getPositionFromBoard(board, player);
