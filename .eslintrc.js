@@ -6,25 +6,20 @@ module.exports = {
   plugins: [
     '@typescript-eslint',
     'vue',
+    'html'
   ],
   parser: 'vue-eslint-parser',
   parserOptions: {
     parser: '@typescript-eslint/parser',
     ecmaVersion: 'latest',
     sourceType: 'module',
-    createDefaultProgram: true,
+    createDefaultProgram: false,
     project: [
       './tsconfig.json',
+      './tsconfig.node.json'
     ],
+    extraFileExtensions: [".vue"],
   },
-  overrides: [
-    {
-      files: ['./src/electron'],
-      parserOptions: {
-        project: ['./tsconfig.node.json'],
-      },
-    },
-  ],
   rules: {
     'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
     'no-debugger': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
@@ -32,27 +27,27 @@ module.exports = {
     'valid-jsdoc': 'off',
     'no-unused-vars': 'off',
     '@typescript-eslint/no-unused-vars': 'error',
+    "vue/first-attribute-linebreak": ["error", {
+      "singleline": "ignore",
+      "multiline": "below"
+    }]
   },
   extends: [
     'eslint:recommended',
     'google',
     'plugin:vue/vue3-recommended',
+    'plugin:vuejs-accessibility/recommended',
     'plugin:@typescript-eslint/eslint-recommended',
     'plugin:import/recommended',
     'plugin:import/typescript',
-    'plugin:vue/recommended',
-    'plugin:vuejs-accessibility/recommended',
     "eslint-config-prettier",
   ],
   settings: {
     'import/resolver': {
       typescript: {},
       alias: {
-        map: [['@/', './src/']],
+        map: [['@/', './src/renderer'], ['@common/', './src/electron']],
       },
-      extensions: [
-        '.js', '.ts', '.vue',
-      ],
     },
   },
 };

@@ -1,7 +1,7 @@
-import { app, Menu } from "electron";
-import { nodeExportDatase, nodeImportDatabase } from "../utils/database";
+import { app, Menu } from 'electron';
+import { nodeExportDatase, nodeImportDatabase } from '../utils/database';
 
-const isMac = process.platform === "darwin";
+const isMac = process.platform === 'darwin';
 
 const template = [
   // { role: 'appMenu' }
@@ -10,73 +10,73 @@ const template = [
         {
           label: app.name,
           submenu: [
-            { role: "about" },
-            { type: "separator" },
-            { role: "services" },
-            { type: "separator" },
-            { role: "hide" },
-            { role: "hideOthers" },
-            { role: "unhide" },
-            { type: "separator" },
-            { role: "quit" }
+            { role: 'about' },
+            { type: 'separator' },
+            { role: 'services' },
+            { type: 'separator' },
+            { role: 'hide' },
+            { role: 'hideOthers' },
+            { role: 'unhide' },
+            { type: 'separator' },
+            { role: 'quit' }
           ]
         }
       ]
     : []),
   // { role: 'fileMenu' }
   {
-    label: "File",
+    label: 'File',
     submenu: [
       {
-        label: "Export Current Database",
-        click: () => nodeExportDatase(),
+        label: 'Export Current Database',
+        click: () => nodeExportDatase()
       },
       {
-        label: "Import Database(s)",
-        click: () => nodeImportDatabase(),
+        label: 'Import Database(s)',
+        click: () => nodeImportDatabase()
       },
-      { role: isMac ? "close" : "quit" }
+      { role: isMac ? 'close' : 'quit' }
     ]
   },
   // { role: 'viewMenu' }
   {
-    label: "View",
+    label: 'View',
     submenu: [
-      { role: "reload" },
-      { role: "forceReload" },
-      { role: "toggleDevTools" },
-      { type: "separator" },
-      { role: "resetZoom" },
-      { role: "zoomIn" },
-      { role: "zoomOut" },
-      { type: "separator" },
-      { role: "togglefullscreen" }
+      { role: 'reload' },
+      { role: 'forceReload' },
+      { role: 'toggleDevTools' },
+      { type: 'separator' },
+      { role: 'resetZoom' },
+      { role: 'zoomIn' },
+      { role: 'zoomOut' },
+      { type: 'separator' },
+      { role: 'togglefullscreen' }
     ]
   },
   // { role: 'windowMenu' }
   {
-    label: "Window",
+    label: 'Window',
     submenu: [
-      { role: "minimize" },
-      { role: "zoom" },
+      { role: 'minimize' },
+      { role: 'zoom' },
       ...(isMac
         ? [
-            { type: "separator" },
-            { role: "front" },
-            { type: "separator" },
-            { role: "window" }
+            { type: 'separator' },
+            { role: 'front' },
+            { type: 'separator' },
+            { role: 'window' }
           ]
-        : [{ role: "close" }])
+        : [{ role: 'close' }])
     ]
   },
   {
-    role: "help",
+    role: 'help',
     submenu: [
       {
-        label: "Learn More",
+        label: 'Learn More',
         click: async () => {
-          const { shell } = require("electron");
-          await shell.openExternal("https://electronjs.org");
+          const { shell } = require('electron');
+          await shell.openExternal('https://electronjs.org');
         }
       }
     ]
