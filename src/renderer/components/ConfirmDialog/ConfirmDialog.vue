@@ -5,9 +5,22 @@ const props = defineProps({
   show: {
     type: Boolean,
     required: true
+  },
+  loading: {
+    type: Boolean,
+    required: false,
+  },
+  title: {
+    type: String,
+    required: false
+  },
+  body: {
+    type: String,
+    required: false
   }
 });
 const emit = defineEmits(['update:show', 'confirm']);
+
 
 const showModal = computed({
   get: () => {
@@ -24,19 +37,30 @@ const confirm = () => {
 };
 </script>
 <template>
-  <q-dialog v-model="showModal" persistent>
-    <q-card>
-      <q-card-section class="row items-center">
-        <span class="q-ml-sm">
-          <slot></slot>
-        </span>
+  <q-dialog v-model="showModal" persistent class="theme-light">
+    <q-card class="dialog">
+      <q-card-section class="dialog__title">
+        <slot name="title">
+          <h2>{{ title }}</h2>
+        </slot>
       </q-card-section>
-
-      <q-card-actions align="right">
+      <q-separator />
+      <q-card-section class="dialog__body">
+          <slot>{{ body }}</slot>
+      </q-card-section>
+      <q-separator />
+      <q-card-actions align="right" class="dialog__actions">
         <q-btn v-close-popup flat label="Cancel" color="primary" />
-        <q-btn flat label="Confirm" color="primary" @click="confirm" />
+        <q-btn label="Confirm" color="primary" :loading="loading" @click="confirm" />
       </q-card-actions>
     </q-card>
   </q-dialog>
 </template>
-<style lang="scss"></style>
+<style scoped lang="scss">
+.dialog {
+  &__title {
+   background-color: var(--q-primary);
+   color: var(--q-accent);
+  }
+}
+</style>

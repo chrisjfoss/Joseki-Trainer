@@ -10,6 +10,7 @@ import type GoBoard from '@sabaki/go-board';
 import { Sign, Vertex } from '@sabaki/go-board';
 import { IndexableType } from 'dexie';
 import { DatabaseApi, MoveApi } from '.';
+import { Position } from '../types';
 
 interface GoBoardWithKo extends GoBoard {
   _koInfo: { sign: Sign; vertex: Vertex };
@@ -17,7 +18,7 @@ interface GoBoardWithKo extends GoBoard {
 
 export const getAllPositions = async (dbName?: string) => {
   const db = await DatabaseApi.getDatabaseRepository(dbName);
-  return await db.positions.toArray();
+  return db.positions.toArray();
 };
 
 export const countReachablePositionsFromBoard = async (
@@ -25,13 +26,36 @@ export const countReachablePositionsFromBoard = async (
   player: DatabaseTypes.Player,
   dbName?: string
 ) => {
-  const position = await getOriginalPositionFromBoard(board, player, dbName);
-  const reachedIds = [position?.id];
-  foreach(move in position?.candidateMoves) {
-  }
-
-  return [position];
+  const position = await getOriginalPositionFromBoard(board, player, true, dbName);
+  return position ? countReachablePositionsFromPosition(position, dbName) : 0;
 };
+
+export const countReachablePositionsFromPosition = async (
+  startPosition: Position,
+  dbName?: string
+) => {
+  let reachablePositions = 0;
+  if(!startPosition.id) return 0;
+  const reachedIds = [startPosition.id];
+  let positionsToCount = [startPosition];
+  while(positionsToCount.length > 0) {
+    const position = positionsToCount.pop()!;
+    positionsToCount = positionsToCount.concat(await getPositionsFromCandidateMoves(position, dbName, true, reachedIds));
+    reachablePositions += 1;
+  }
+  return reachablePositions;
+};
+
+export const getPositionsFromCandidateMoves = (position: Position, dbName?: string, includeCandidateMoves?: boolean, filteredPositionIds?: number[]) => {
+  return Promise.all(
+    position.candidateMoves.map(
+      (move) => filteredPositionIds?.includes(move.positionId as number) 
+        ? undefined 
+        : getPositionById(move.positionId, includeCandidateMoves, dbName)
+      )
+      .filter(position => !!position) as Promise<DatabaseTypes.Position>[]
+    )
+}
 
 export const getPositionById = async (
   id: IndexableType,
@@ -53,10 +77,11 @@ export const getPositionById = async (
 export const getOriginalPositionFromBoard = async (
   board: GoBoard,
   player: DatabaseTypes.Player,
+  includeCandidateMoves?: boolean,
   dbName?: string
 ) => {
   const db = await DatabaseApi.getDatabaseRepository(dbName);
-  return await db.transaction('r', db.positions, db.moves, async () => {
+  const position = await db.transaction('r', db.positions, db.moves, async () => {
     // Get all position transformations
     const { original, ...positionStrings } = getAllPositionStrings(board);
 
@@ -88,15 +113,25 @@ export const getOriginalPositionFromBoard = async (
         );
       })
       .first();
-  });
+    });
+    if (position && includeCandidateMoves) {
+      // Get all moves for the position
+      position.candidateMoves = await MoveApi.getMovesByPositionId(
+        position.id as IndexableType,
+        dbName
+      );
+    }
+
+    return position;
 };
 
 export const getPositionFromBoard = async (
   board: GoBoard,
   player: DatabaseTypes.Player,
+  includeCandidateMoves?: boolean,
   dbName?: string
 ) => {
-  const dbPosition = await getOriginalPositionFromBoard(board, player, dbName);
+  const dbPosition = await getOriginalPositionFromBoard(board, player, includeCandidateMoves, dbName);
   const transformations = getAllPositionStrings(board);
 
   if (dbPosition) {
@@ -155,7 +190,7 @@ export const savePosition = async (
 
   // Create position if doesn't exist
   return (
-    dbPosition?.id ?? (await addPosition(boardId, originalString, player, ko))
+    dbPosition?.id ?? (addPosition(boardId, originalString, player, ko))
   );
 };
 
@@ -166,7 +201,7 @@ const addPosition = async (
   ko: Vertex
 ) => {
   const db = await DatabaseApi.getDatabaseRepository();
-  return await db.positions.add({
+  return db.positions.add({
     boardDimensionId: boardId,
     position: positionString,
     ko: {
@@ -188,7 +223,7 @@ export const updatePositionData = async (
   tag?: string
 ) => {
   const db = await DatabaseApi.getDatabaseRepository();
-  return await db.positions.update(positionId, {
+  return db.positions.update(positionId, {
     comments,
     evaluation,
     tag

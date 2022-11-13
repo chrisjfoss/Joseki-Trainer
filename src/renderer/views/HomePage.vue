@@ -12,7 +12,6 @@ import {
 } from 'vue';
 
 // Types
-import MoveDisplay from '@/components/MoveDisplay.vue';
 import type { MoveList, Move } from '@/types';
 
 // API / Utils
@@ -29,6 +28,7 @@ import Board from '@sabaki/go-board';
 import ConfirmDialog from '@/components/ConfirmDialog';
 import GoBoard from '@/components/GoBoard.vue';
 import CandidateMoveDisplay from '@/components/CandidateMoveDisplay.vue';
+import MoveDisplay from '@/components/MoveDisplay.vue';
 
 const showConfirmDeleteModal = ref(false);
 
@@ -203,6 +203,16 @@ onBeforeUnmount(() => {
   window.removeEventListener('keydown', cycleMove);
 });
 
+const reachablePositionCount = ref(0);
+const loadingPositionCount = ref(false);
+watch([showConfirmDeleteModal], async () => {
+  loadingPositionCount.value = true;
+  reachablePositionCount.value = await PositionApi.countReachablePositionsFromBoard(board.value, player.value);
+  loadingPositionCount.value = false;
+}, {
+  immediate: true
+})
+
 const tenuki = () => {
   moveList.value.push({
     ...moveList.value[turn.value],
@@ -301,8 +311,15 @@ const deletePositions = async () => {
     </span>
     <ConfirmDialog
       v-model:show="showConfirmDeleteModal"
+      title="Delete positions?"
+      :loading="loadingPositionCount"
       @confirm="deletePositions()"
-    ></ConfirmDialog>
+    >
+    <span class="dialog">
+      <q-spinner-oval size='md' color="primary" />
+    </span>
+      <span v-if="loadingPositionCount">Positions getting deleted: {{ reachablePositionCount }}</span>
+  </ConfirmDialog>
   </div>
 </template>
 <!-- Add "scoped" attribute to limit CSS to this component only -->
@@ -346,6 +363,13 @@ const deletePositions = async () => {
     grid-template-columns: repeat(2, max-content) 1fr max-content;
     gap: 1rem;
   }
+}
+
+.dialog {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .actions__button--tenuki {
