@@ -27,10 +27,6 @@ module.exports = {
     'valid-jsdoc': 'off',
     'no-unused-vars': 'off',
     '@typescript-eslint/no-unused-vars': 'error',
-    "vue/first-attribute-linebreak": ["error", {
-      "singleline": "ignore",
-      "multiline": "below"
-    }]
   },
   extends: [
     'eslint:recommended',

@@ -7,6 +7,8 @@ const props = defineProps({
     required: true
   }
 });
+const emit = defineEmits(['update:show', 'confirm']);
+
 const showModal = computed({
   get: () => {
     return props.show;
@@ -16,23 +18,23 @@ const showModal = computed({
   }
 });
 
-const emit = defineEmits(['update:show']);
+const confirm = () => {
+  showModal.value = false;
+  emit('confirm');
+};
 </script>
 <template>
-  <q-dialog v-model="showModal">
+  <q-dialog v-model="showModal" persistent>
     <q-card>
-      <q-card-section>
-        <div class="text-h6">
-          <slot name="header"></slot>
-        </div>
-      </q-card-section>
-
-      <q-card-section class="q-pt-none">
-        <slot></slot>
+      <q-card-section class="row items-center">
+        <span class="q-ml-sm">
+          <slot></slot>
+        </span>
       </q-card-section>
 
       <q-card-actions align="right">
-        <q-btn v-close-popup flat label="OK" color="primary" />
+        <q-btn v-close-popup flat label="Cancel" color="primary" />
+        <q-btn flat label="Confirm" color="primary" @click="confirm" />
       </q-card-actions>
     </q-card>
   </q-dialog>

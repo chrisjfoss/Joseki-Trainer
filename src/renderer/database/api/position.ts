@@ -1,15 +1,15 @@
-import { type DatabaseTypes } from "@/database";
-import { getBoard, addBoard } from "./board";
+import { type DatabaseTypes } from '@/database';
+import { getBoard, addBoard } from './board';
 import {
   getAllPositionStrings,
   getAppliedTransformation,
   getInverseTransformation
-} from "@/utils";
-import { getVerticeTransformation } from "@/utils/matrixUtil";
-import type GoBoard from "@sabaki/go-board";
-import { Sign, Vertex } from "@sabaki/go-board";
-import { IndexableType } from "dexie";
-import { DatabaseApi, MoveApi } from ".";
+} from '@/utils';
+import { getVerticeTransformation } from '@/utils/matrixUtil';
+import type GoBoard from '@sabaki/go-board';
+import { Sign, Vertex } from '@sabaki/go-board';
+import { IndexableType } from 'dexie';
+import { DatabaseApi, MoveApi } from '.';
 
 interface GoBoardWithKo extends GoBoard {
   _koInfo: { sign: Sign; vertex: Vertex };
@@ -18,6 +18,19 @@ interface GoBoardWithKo extends GoBoard {
 export const getAllPositions = async (dbName?: string) => {
   const db = await DatabaseApi.getDatabaseRepository(dbName);
   return await db.positions.toArray();
+};
+
+export const countReachablePositionsFromBoard = async (
+  board: GoBoard,
+  player: DatabaseTypes.Player,
+  dbName?: string
+) => {
+  const position = await getOriginalPositionFromBoard(board, player, dbName);
+  const reachedIds = [position?.id];
+  foreach(move in position?.candidateMoves) {
+  }
+
+  return [position];
 };
 
 export const getPositionById = async (
@@ -43,16 +56,16 @@ export const getOriginalPositionFromBoard = async (
   dbName?: string
 ) => {
   const db = await DatabaseApi.getDatabaseRepository(dbName);
-  return await db.transaction("r", db.positions, db.moves, async () => {
+  return await db.transaction('r', db.positions, db.moves, async () => {
     // Get all position transformations
     const { original, ...positionStrings } = getAllPositionStrings(board);
 
     // Get all db positions that match any position transformations
     const returnValue = Object.keys(positionStrings).reduce((acc, current) => {
       return acc
-        .or("position")
+        .or('position')
         .equals(positionStrings[current as keyof typeof positionStrings]);
-    }, db.positions.where("position").equals(original));
+    }, db.positions.where('position').equals(original));
 
     return returnValue
       .filter((position) => {
@@ -121,14 +134,17 @@ export const getPositionFromBoard = async (
   return dbPosition;
 };
 
-export const savePosition = async (board: GoBoard, player: DatabaseTypes.Player) => {
+export const savePosition = async (
+  board: GoBoard,
+  player: DatabaseTypes.Player
+) => {
   const dbBoard = await getBoard(board.width, board.height);
   // Create board if it doesn't exist
 
-  const boardId = dbBoard?.id ?? (await addBoard(board.width, board.height)) as number;
+  const boardId =
+    dbBoard?.id ?? ((await addBoard(board.width, board.height)) as number);
 
-  const { original: originalString } =
-    getAllPositionStrings(board);
+  const { original: originalString } = getAllPositionStrings(board);
 
   const dbPosition = await getPositionFromBoard(board, player);
 
@@ -158,9 +174,9 @@ const addPosition = async (
       y: ko[1]
     },
     player,
-    comments: "",
-    evaluation: "",
-    tag: "",
+    comments: '',
+    evaluation: '',
+    tag: '',
     candidateMoves: []
   });
 };
