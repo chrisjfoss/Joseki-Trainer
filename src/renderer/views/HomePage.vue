@@ -205,13 +205,21 @@ onBeforeUnmount(() => {
 
 const reachablePositionCount = ref(0);
 const loadingPositionCount = ref(false);
-watch([showConfirmDeleteModal], async () => {
-  loadingPositionCount.value = true;
-  reachablePositionCount.value = await PositionApi.countReachablePositionsFromBoard(board.value, player.value);
-  loadingPositionCount.value = false;
-}, {
-  immediate: true
-})
+watch(
+  [showConfirmDeleteModal],
+  async () => {
+    loadingPositionCount.value = true;
+    reachablePositionCount.value =
+      await PositionApi.countReachablePositionsFromBoard(
+        board.value,
+        player.value
+      );
+    loadingPositionCount.value = false;
+  },
+  {
+    immediate: true
+  }
+);
 
 const tenuki = () => {
   moveList.value.push({
@@ -311,15 +319,15 @@ const deletePositions = async () => {
     </span>
     <ConfirmDialog
       v-model:show="showConfirmDeleteModal"
-      title="Delete positions?"
+      title="Delete moves?"
       :loading="loadingPositionCount"
       @confirm="deletePositions()"
     >
-    <span class="dialog">
-      <q-spinner-oval size='md' color="primary" />
-    </span>
-      <span v-if="loadingPositionCount">Positions getting deleted: {{ reachablePositionCount }}</span>
-  </ConfirmDialog>
+      <span v-if="loadingPositionCount" class="dialog">
+        <q-spinner-oval size="md" color="primary" />
+      </span>
+      <span v-else> This will delete {{ reachablePositionCount }} moves. </span>
+    </ConfirmDialog>
   </div>
 </template>
 <!-- Add "scoped" attribute to limit CSS to this component only -->
