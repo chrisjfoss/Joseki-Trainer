@@ -1,37 +1,38 @@
-import TrainingPage from "@/views/TrainingPage.vue";
-import StatisticsPage from "@/views/StatisticsPage.vue";
-import DatabasePage from "@/views/DatabasePage.vue";
-import App from "@/views/Home.vue";
+import TrainingPage from '@/views/TrainingPage.vue';
+import StatisticsPage from '@/views/StatisticsPage.vue';
+import DatabasePage from '@/views/DatabasePage.vue';
+import HomePage from '@/views/HomePage.vue';
 
 import {
   createRouter,
   createWebHashHistory,
   createWebHistory
-} from "vue-router";
+} from 'vue-router';
 
 const routes = [
   {
-    path: "/",
-    component: App
+    path: '/',
+    component: HomePage
   },
   {
-    path: "/train",
+    path: '/train',
     component: TrainingPage
   },
   {
-    path: "/statistics",
+    path: '/statistics',
     component: StatisticsPage
   },
   {
-    path: "/databases",
+    path: '/databases',
     component: DatabasePage
   }
 ];
 
 const router = createRouter({
-  history: navigator.userAgent.toLowerCase().indexOf(' electron/') > -1
-    ? createWebHashHistory()
-    : createWebHistory(),
+  history:
+    navigator.userAgent.toLowerCase().indexOf(' electron/') > -1
+      ? createWebHashHistory()
+      : createWebHistory(),
   routes
 });
 

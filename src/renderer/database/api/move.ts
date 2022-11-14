@@ -95,7 +95,7 @@ export const getMovesByPositionId = async (
 ) => {
   const db = await DatabaseApi.getDatabaseRepository(dbName);
   // Get all moves for the position
-  return await db.moves
+  return db.moves
     .where("previousPositionId")
     .equals(positionId)
     .toArray();
@@ -133,7 +133,7 @@ export const getMoveByPrevAndCurrentPositionId = async (
   currentPositionId: IndexableType
 ) => {
   const db = await DatabaseApi.getDatabaseRepository();
-  return await db.moves
+  return db.moves
     .where("previousPositionId")
     .equals(prevPositionId)
     .and((move) => move.positionId === currentPositionId)
@@ -143,7 +143,7 @@ export const getMoveByPrevAndCurrentPositionId = async (
 export const getMovesToReachPositionId = async (positionId: IndexableType) => {
   const db = await DatabaseApi.getDatabaseRepository();
   // Get all moves for the position
-  return await db.moves.where("positionId").equals(positionId).toArray();
+  return db.moves.where("positionId").equals(positionId).toArray();
 };
 
 export const trainedMove = async (moveId: number, result: Training.Result) => {
@@ -237,7 +237,7 @@ const addMove = async (
 ) => {
   const db = await DatabaseApi.getDatabaseRepository();
   const nextSessionDate = new Date();
-  return await db.moves.add({
+  return db.moves.add({
     point: {
       x: point[0],
       y: point[1]

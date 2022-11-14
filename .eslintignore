@@ -1,0 +1,6 @@
+.vscsode
+dist-electron
+dist
+node_modules
+public
+release

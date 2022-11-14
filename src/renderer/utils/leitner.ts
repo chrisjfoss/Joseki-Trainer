@@ -23,7 +23,6 @@ export const getDeckWithSessionAtIndex = (session: number, index: number) => {
 };
 
 export const getCurrentSession = () => {
-  const now = new Date();
   return getSessionForDate(new Date());
 };
 

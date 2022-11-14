@@ -1,45 +1,7 @@
-<template>
-  <div class="page" @keyup.up="previousMove" @keyup.down="nextMove">
-    <div class="page__sidebar">
-      <MoveDisplay
-      :moves="moveList"
-      :turn="turn"
-      :board-height="board.height"
-      @mouseenter="setHoveredBoard"
-      @mouseleave:all="setHoveredBoard(null)"
-      @click="jumpToPosition"
-      />
-      <CandidateMoveDisplay
-      :position="dbPosition ?? undefined"
-      :dimensions="{ rows: board.height, columns: board.width }"
-      />
-    </div>
-    <span class="page__main">
-      <GoBoard
-        v-model:player="player"
-        v-model:moveList="moveList"
-        v-model:turn="turn"
-        class="board"
-        :board="displayBoard"
-        show-coordinates
-        :ghost-stones="ghostStones"
-        width="100%"
-        @update:board="(val) => (board = val)"
-      />
-      <span class="page__actions">
-        <q-btn no-caps class="actions__button" text-color="accent" color="negative" @click="deletePositions()">Delete current line</q-btn>
-        <q-btn no-caps class="actions__button" text-color="accent" color="primary" @click="saveMoves()">Save</q-btn>
-        <q-btn no-caps class="actions__button actions__button--tenuki" text-color="accent" color="primary" @click="tenuki()">Tenuki</q-btn>
-      </span>
-    </span>
-
-  </div>
-</template>
-
 <script setup lang="ts">
+// Vue
 import {
   computed,
-  defineComponent,
   inject,
   onBeforeUnmount,
   onMounted,
@@ -47,15 +9,28 @@ import {
   ref,
   watch,
   watchEffect
-} from "vue";
-import GoBoard from "../components/GoBoard.vue";
-import Board from "@sabaki/go-board";
-import type { MoveList, Move } from "../types";
-import MoveDisplay from "../components/MoveDisplay.vue";
+} from 'vue';
 
-import { PositionApi, MoveApi, DatabaseApi, type DatabaseTypes } from "@/database";
-import CandidateMoveDisplay from "@/components/CandidateMoveDisplay.vue";
-import { MoveUtil, PlayerUtil } from "@/utils";
+// Types
+import type { MoveList, Move } from '@/types';
+
+// API / Utils
+import {
+  PositionApi,
+  MoveApi,
+  DatabaseApi,
+  type DatabaseTypes
+} from '@/database';
+import { MoveUtil, PlayerUtil } from '@/utils';
+import Board from '@sabaki/go-board';
+
+// Components
+import ConfirmDialog from '@/components/ConfirmDialog';
+import GoBoard from '@/components/GoBoard.vue';
+import CandidateMoveDisplay from '@/components/CandidateMoveDisplay.vue';
+import MoveDisplay from '@/components/MoveDisplay.vue';
+
+const showConfirmDeleteModal = ref(false);
 
 const rows = ref(19);
 const columns = ref(19);
@@ -112,7 +87,7 @@ const setGhostStones = async () => {
       if (!MoveUtil.isTenuki(move)) {
         newGhostStones[move.point.y][move.point.x] = {
           sign: player.value,
-          type: "interesting",
+          type: 'interesting',
           faint: true
         };
       }
@@ -123,7 +98,7 @@ const setGhostStones = async () => {
 
 watchEffect(setGhostStones);
 
-const refetchDatabaseInfo = inject("refetchDatabaseInfo") as Ref<string>;
+const refetchDatabaseInfo = inject('refetchDatabaseInfo') as Ref<string>;
 watch(
   refetchDatabaseInfo,
   async () => {
@@ -182,10 +157,7 @@ const nextMove = () => {
     board.value = moveList.value[turn.value].board;
     player.value = moveList.value[turn.value].player === 1 ? -1 : 1;
     processingMove.value = false;
-  } else if (
-    dbPosition.value &&
-    dbPosition.value?.candidateMoves.length > 0
-  ) {
+  } else if (dbPosition.value && dbPosition.value?.candidateMoves.length > 0) {
     const move: [number, number] = [
       dbPosition.value.candidateMoves[0].point.x,
       dbPosition.value.candidateMoves[0].point.y
@@ -209,9 +181,9 @@ watch(dbPosition, () => {
 
 const cycleMove = (event: KeyboardEvent) => {
   if (processingMove.value) return;
-  if (event.key === "ArrowLeft") {
+  if (event.key === 'ArrowLeft') {
     previousMove();
-  } else if (event.key === "ArrowRight") {
+  } else if (event.key === 'ArrowRight') {
     nextMove();
   }
 };
@@ -224,12 +196,30 @@ onMounted(async () => {
   updateDatabaseList();
 });
 onMounted(() => {
-  window.addEventListener("keydown", cycleMove);
+  window.addEventListener('keydown', cycleMove);
 });
 
 onBeforeUnmount(() => {
-  window.removeEventListener("keydown", cycleMove);
+  window.removeEventListener('keydown', cycleMove);
 });
+
+const reachablePositionCount = ref(0);
+const loadingPositionCount = ref(false);
+watch(
+  [showConfirmDeleteModal],
+  async () => {
+    loadingPositionCount.value = true;
+    reachablePositionCount.value =
+      await PositionApi.countReachablePositionsFromBoard(
+        board.value,
+        player.value
+      );
+    loadingPositionCount.value = false;
+  },
+  {
+    immediate: true
+  }
+);
 
 const tenuki = () => {
   moveList.value.push({
@@ -270,37 +260,110 @@ const deletePositions = async () => {
   }
 };
 </script>
-
+<template>
+  <div class="page" @keyup.up="previousMove" @keyup.down="nextMove">
+    <div class="page__sidebar">
+      <MoveDisplay
+        :moves="moveList"
+        :turn="turn"
+        :board-height="board.height"
+        @mouseenter="setHoveredBoard"
+        @focusin="setHoveredBoard"
+        @focusout="setHoveredBoard(null)"
+        @mouseleave:all="setHoveredBoard(null)"
+        @click="jumpToPosition"
+      />
+      <CandidateMoveDisplay
+        :position="dbPosition ?? undefined"
+        :dimensions="{ rows: board.height, columns: board.width }"
+      />
+    </div>
+    <span class="page__main">
+      <GoBoard
+        v-model:player="player"
+        v-model:moveList="moveList"
+        v-model:turn="turn"
+        class="board"
+        :board="displayBoard"
+        show-coordinates
+        :ghost-stones="ghostStones"
+        width="100%"
+        @update:board="(val) => (board = val)"
+      />
+      <span class="page__actions">
+        <q-btn
+          no-caps
+          class="actions__button"
+          text-color="accent"
+          color="negative"
+          @click="showConfirmDeleteModal = true"
+          >Delete current line</q-btn
+        >
+        <q-btn
+          no-caps
+          class="actions__button"
+          text-color="accent"
+          color="primary"
+          @click="saveMoves()"
+          >Save</q-btn
+        >
+        <q-btn
+          no-caps
+          class="actions__button actions__button--tenuki"
+          text-color="accent"
+          color="primary"
+          @click="tenuki()"
+          >Tenuki</q-btn
+        >
+      </span>
+    </span>
+    <ConfirmDialog
+      v-model:show="showConfirmDeleteModal"
+      title="Delete moves?"
+      :loading="loadingPositionCount"
+      @confirm="deletePositions()"
+    >
+      <span v-if="loadingPositionCount" class="dialog">
+        <q-spinner-oval size="md" color="primary" />
+      </span>
+      <span v-else> This will delete {{ reachablePositionCount }} moves. </span>
+    </ConfirmDialog>
+  </div>
+</template>
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
 .page {
   margin: 0 1rem;
   display: grid;
   gap: 1rem;
+
   @include mixin-for-tablet-landscape-up {
     grid-template-columns: 23rem 1fr;
   }
+
   &__sidebar {
     display: grid;
     gap: 1rem;
     grid-template-rows: minmax(250px, 1fr) minmax(250px, min-content);
-    
+
     @include mixin-for-tablet-portrait-up {
       grid-template-columns: repeat(2, 1fr);
     }
-    
+
     @include mixin-for-tablet-landscape-up {
       grid-template-columns: 1fr;
       grid-column: 1;
       grid-row: 1 / -1;
     }
   }
+
   &__main {
     display: flex;
     flex-direction: column;
     gap: 0.75rem;
     grid-row: 1;
   }
+
   &__actions {
     grid-column: 1 / -1;
     max-width: 800px;
@@ -309,6 +372,14 @@ const deletePositions = async () => {
     gap: 1rem;
   }
 }
+
+.dialog {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .actions__button--tenuki {
   grid-column: -1;
 }
