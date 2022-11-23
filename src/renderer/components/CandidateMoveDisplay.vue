@@ -1,9 +1,9 @@
 <template>
-  <q-card dark id="candidates-display" class="candidates-display">
+  <q-card id="candidates-display" dark class="candidates-display">
     <q-card-section class="candidates-display__header">
       Candidate Moves
     </q-card-section>
-  <q-separator color="accent" dark inset/>
+    <q-separator color="accent" dark inset />
     <q-card-section class="candidates-display__moves">
       <div
         v-for="(candidate, i) in candidates"
@@ -16,13 +16,13 @@
   </q-card>
 </template>
 <script lang="ts">
-import { computed, defineComponent } from "vue";
-import { type DatabaseTypes } from "@/database";
-import { alpha } from "./GoBoard/ShudanPort/helper";
-import { MoveUtil } from "@/utils";
+import { computed, defineComponent } from 'vue';
+import type { DatabaseTypes } from '@/database';
+import { alpha } from './GoBoard/ShudanPort/helper';
+import { MoveUtil } from '@/utils';
 
 export default defineComponent({
-  name: "CandidateMoveDisplay",
+  name: 'CandidateMoveDisplay',
   props: {
     position: {
       type: Object as () => DatabaseTypes.Position,
@@ -43,7 +43,7 @@ export default defineComponent({
     });
     const getVertexName = (vertex: { x: number; y: number }) => {
       if (!vertex) {
-        return "";
+        return '';
       }
       return `${alpha[vertex.x]}${props.dimensions.rows - vertex.y}`;
     };

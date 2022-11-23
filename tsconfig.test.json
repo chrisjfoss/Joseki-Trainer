@@ -1,0 +1,33 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "composite": true,
+    "baseUrl": "./",
+    "paths": {
+      "@/*": [
+        "src/renderer/*"
+      ],
+      "@common/*": [
+        "src/common/*"
+      ],
+      "@electron/*": [
+        "src/electron/*"
+      ]
+    }
+  },
+  "include": [
+    "tests",
+    "**/__mocks__"
+  ],
+  "exclude": [
+    "node_modules",
+    "src",
+    ".eslintrc.js",
+    "package.json"
+  ],
+  "references": [
+    {
+      "path": "./tsconfig.json"
+    },
+  ]
+}

@@ -8,13 +8,13 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, provide, Ref, ref, watch } from "vue";
-import TheHeader from "@/components/TheHeader";
+import { defineComponent, onMounted, provide, type Ref, ref, watch } from 'vue';
+import TheHeader from '@/components/TheHeader';
 
-import { liveQuery } from "dexie";
-import { useObservable } from "@vueuse/rxjs";
-import { DatabaseCore, DatabaseApi } from "./database";
-import { EVENTS } from "@common/events";
+import { liveQuery } from 'dexie';
+import { useObservable } from '@vueuse/rxjs';
+import { DatabaseCore, DatabaseApi } from './database';
+import { EVENTS } from '@common/events';
 
 const apiWindow = window as typeof window & {
   api: {
@@ -24,7 +24,7 @@ const apiWindow = window as typeof window & {
 };
 
 export default defineComponent({
-  name: "App",
+  name: 'App',
   components: {
     TheHeader
   },
@@ -58,10 +58,10 @@ export default defineComponent({
           const name = repo[0].name;
           return name;
         }
-        return "default";
+        return 'default';
       }) as any
     ) as Readonly<Ref<string>>;
-    const currentDatabase = ref("");
+    const currentDatabase = ref('');
     const refetchDatabaseInfo = ref(false);
     watch(readonlyActiveDatabase, () => {
       currentDatabase.value = readonlyActiveDatabase.value;
@@ -72,9 +72,9 @@ export default defineComponent({
       refetchDatabaseInfo.value = true;
     });
     // This is the value to change
-    provide("currentDatabase", currentDatabase);
+    provide('currentDatabase', currentDatabase);
     // This is the value to watch
-    provide("refetchDatabaseInfo", refetchDatabaseInfo);
+    provide('refetchDatabaseInfo', refetchDatabaseInfo);
   }
 });
 </script>

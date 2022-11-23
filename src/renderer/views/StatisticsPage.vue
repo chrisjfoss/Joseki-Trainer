@@ -21,11 +21,14 @@
   </div>
 </template>
 <script lang="ts">
-import { defineComponent, inject, onMounted, Ref, ref, watch } from "vue";
-import { MoveApi } from "@/database";
+// Vue
+import { defineComponent, inject, onMounted, type Ref, ref, watch } from 'vue';
+
+// API
+import { MoveApi } from '@/database';
 
 export default defineComponent({
-  name: "StatisticsPage",
+  name: 'StatisticsPage',
   setup() {
     const allMoveCountsBySessionDate: Ref<
       { database: string; moveCounts: [number, number][] }[]
@@ -34,7 +37,7 @@ export default defineComponent({
       allMoveCountsBySessionDate.value =
         await MoveApi.getAllMoveCountsBySessionDate();
     });
-    const refetchDatabaseInfo = inject("refetchDatabaseInfo") as Ref<boolean>;
+    const refetchDatabaseInfo = inject('refetchDatabaseInfo') as Ref<boolean>;
 
     watch(
       refetchDatabaseInfo,

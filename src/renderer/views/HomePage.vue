@@ -5,7 +5,7 @@ import {
   inject,
   onBeforeUnmount,
   onMounted,
-  Ref,
+  type Ref,
   ref,
   watch,
   watchEffect

@@ -1,23 +1,27 @@
 <script lang="ts">
-import { defineComponent } from "@vue/runtime-core";
-import { computed, ref } from "vue";
-import Board from "@sabaki/go-board";
-import { GhostStone, Vertex } from "./GoBoard/ShudanPort/types";
-import { MoveList } from "@/types";
-import _ from "lodash";
+// Vue
+import { computed, defineComponent, ref } from 'vue';
+
+// Types
+import type { GhostStone, Vertex } from './GoBoard/ShudanPort/types';
+import type { MoveList } from '@/types';
+import type Board from '@sabaki/go-board';
+
+// Utils
+import { cloneDeep } from 'lodash';
 
 export default defineComponent({
-  name: "GoBoard",
+  name: 'GoBoard',
   props: {
     width: {
       type: [Number, String],
       required: false,
-      default: "100%"
+      default: '100%'
     },
     maxWidth: {
       type: [Number, String],
       required: false,
-      default: "100%"
+      default: '100%'
     },
     board: {
       type: Object as () => InstanceType<typeof Board>,
@@ -47,15 +51,15 @@ export default defineComponent({
     }
   },
   emits: [
-    "update:player",
-    "update:board",
-    "update:moveList",
-    "update:turn",
-    "check-move"
+    'update:player',
+    'update:board',
+    'update:moveList',
+    'update:turn',
+    'check-move'
   ],
   setup(props, context) {
-    const widthNumericPart = props.width.toString().replace(/[^0-9]/g, "");
-    const widthUnitPart = props.width.toString().replace(/[0-9]/g, "");
+    const widthNumericPart = props.width.toString().replace(/[^0-9]/g, '');
+    const widthUnitPart = props.width.toString().replace(/[0-9]/g, '');
     const vertexSize = computed(() => {
       const divisor = props.showCoordinates ? 2.5 : 1;
       return `${
@@ -69,7 +73,7 @@ export default defineComponent({
           ? Array(props.board.height)
               .fill(null)
               .map(() => Array(props.board.width).fill(null))
-          : _.cloneDeep(props.ghostStones);
+          : cloneDeep(props.ghostStones);
 
       try {
         if (highlightedVertex.value) {
@@ -107,10 +111,10 @@ export default defineComponent({
       if (!overwrite && !suicide && !ko) {
         ghostStoneMap.value[y][x] = null;
         const board = props.board.makeMove(props.player, vertex);
-        context.emit("update:board", board);
-        context.emit("update:player", props.player * -1);
-        context.emit("update:turn", props.turn + 1);
-        context.emit("check-move", { move: vertex, board });
+        context.emit('update:board', board);
+        context.emit('update:player', props.player * -1);
+        context.emit('update:turn', props.turn + 1);
+        context.emit('check-move', { move: vertex, board });
 
         const moveList = [
           ...props.moveList.slice(0, props.turn + 1),
@@ -120,7 +124,7 @@ export default defineComponent({
             player: props.player
           }
         ];
-        context.emit("update:moveList", moveList);
+        context.emit('update:moveList', moveList);
       }
     };
 

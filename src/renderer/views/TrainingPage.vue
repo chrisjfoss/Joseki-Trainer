@@ -22,19 +22,30 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, Ref, ref, computed, watch, inject } from "vue";
-import TrainingBoard from "../components/TrainingBoard.vue";
-import TrainingStats from "../components/TrainingStats.vue";
-import { PositionApi, MoveApi, BoardApi } from "@/database";
-import { Move, MoveList } from "@/types";
-import { type DatabaseTypes } from "@/database";
-import Board from "@sabaki/go-board";
-import { Training } from "@/constants";
-import { BoardUtil, getRandomTransformation, Matrix } from "@/utils";
-import _ from "lodash";
+// Vue
+import { defineComponent, type Ref, ref, computed, watch, inject } from 'vue';
+
+// API
+import { PositionApi, MoveApi, BoardApi } from '@/database';
+
+// Components
+import TrainingBoard from '@/components/TrainingBoard.vue';
+import TrainingStats from '@/components/TrainingStats.vue';
+
+// Constants
+import { Training } from '@/constants';
+
+// Types
+import type { Move, MoveList } from '@/types';
+import type { DatabaseTypes } from '@/database';
+import Board from '@sabaki/go-board';
+
+// Utils
+import { BoardUtil, getRandomTransformation, Matrix } from '@/utils';
+import { cloneDeep } from 'lodash';
 
 export default defineComponent({
-  name: "TrainingPage",
+  name: 'TrainingPage',
   components: {
     TrainingBoard,
     TrainingStats
@@ -66,7 +77,7 @@ export default defineComponent({
     const currentMove = computed(() => {
       return movesToTrain.value[0];
     });
-    const refetchDatabaseInfo = inject("refetchDatabaseInfo") as Ref<string>;
+    const refetchDatabaseInfo = inject('refetchDatabaseInfo') as Ref<string>;
     watch(
       refetchDatabaseInfo,
       async () => {
@@ -169,7 +180,7 @@ export default defineComponent({
         interactable.value = true;
 
         if (movesToTrain.value.length === 0) {
-          alert("All done training!");
+          alert('All done training!');
         }
       } else if (result === Training.Result.alternate) {
         setTimeout(() => {
@@ -179,7 +190,7 @@ export default defineComponent({
           boardIsUpdatedFromChild.value = false;
           board.value = originalBoard;
           interactable.value = true;
-          alert("Alternate move. Try again.");
+          alert('Alternate move. Try again.');
         }, waitBetweenMoves.value);
       } else {
         setTimeout(() => {
@@ -187,7 +198,7 @@ export default defineComponent({
           turn.value--;
           moveList.value.pop();
           incorrectMoves.value++;
-          const moveToSave = _.cloneDeep(movesToTrain.value[0]);
+          const moveToSave = cloneDeep(movesToTrain.value[0]);
           movesToTrain.value = [
             ...movesToTrain.value.slice(1, movesToTrain.value.length),
             moveToSave
@@ -195,7 +206,7 @@ export default defineComponent({
           boardIsUpdatedFromChild.value = false;
           board.value = originalBoard;
           interactable.value = true;
-          alert("Incorrect.");
+          alert('Incorrect.');
         }, waitBetweenMoves.value);
       }
     };

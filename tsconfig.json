@@ -1,33 +1,40 @@
 {
+  "extends": "@vue/tsconfig/tsconfig.web.json",
   "compilerOptions": {
-    "target": "ESNext",
-    "module": "ESNext",
-    "moduleResolution": "node",
+    "composite": true,
     "importHelpers": true,
     "jsx": "preserve",
     "esModuleInterop": true,
     "resolveJsonModule": true,
     "sourceMap": true,
-    "baseUrl": "./",
-    "strict": true,
     "paths": {
       "@/*": [
-        "src/renderer/*"
+        "./src/renderer/*"
       ],
       "@common/*": [
-        "src/common/*"
+        "./src/common/*"
+      ],
+      "@electron/*": [
+        "./src/electron/*"
       ],
     },
-    "allowSyntheticDefaultImports": true,
-    "skipLibCheck": true
   },
   "include": [
-    "src/renderer",
-    "src/common"
+    "src",
+    ".eslintrc.js",
+    "package.json",
+    "vite.config.ts",
+    "vitest.config.ts"
+  ],
+  "exclude": [
+    "**/__mocks__",
+    "tests",
+    "node_modules",
+    "dist"
   ],
   "references": [
     {
-      "path": "./tsconfig.node.json"
-    }
+      "path": "./tsconfig.test.json"
+    },
   ]
 }

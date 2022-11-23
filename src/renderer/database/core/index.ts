@@ -1,15 +1,18 @@
-import Dexie, { Table } from "dexie";
-import type { Move, Position, Repository } from "../types";
-import { BoardDimension } from "../types/BoardDimension";
+// Dexie
+import Dexie, { type Table } from 'dexie';
+
+// Types
+import type { Move, Position, Repository } from '../types';
+import type { BoardDimension } from '../types/BoardDimension';
 
 export class RepositoryManagerDatabase extends Dexie {
   repositories!: Table<Repository>;
   activeRepository!: Table<Repository>;
   constructor() {
-    super("RepositoryManager");
+    super('RepositoryManager');
     this.version(2).stores({
-      repositories: "++id, name",
-      activeRepository: "++id, name"
+      repositories: '++id, name',
+      activeRepository: '++id, name'
     });
   }
 }
@@ -21,12 +24,12 @@ export class RepositoryDatabase extends Dexie {
   moves!: Table<Move>;
 
   constructor(name?: string) {
-    super(name || "default");
+    super(name || 'default');
     this.version(1).stores({
-      boardDimensions: "++id, [rows+columns]",
-      positions: "++id, position, boardDimensionId, ko, tag", // Primary key and indexed props
+      boardDimensions: '++id, [rows+columns]',
+      positions: '++id, position, boardDimensionId, ko, tag', // Primary key and indexed props
       moves:
-        "++id, point, positionId, previousPositionId, deck, nextSessionTimestamp"
+        '++id, point, positionId, previousPositionId, deck, nextSessionTimestamp'
     });
   }
 }

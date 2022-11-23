@@ -1,10 +1,14 @@
-import Board, { Sign } from "@sabaki/go-board";
-import * as Matrix from "./matrixUtil";
-import * as Leitner from "./leitner";
-import * as BoardUtil from "./board";
-import * as MoveUtil from "./move";
-import * as PositionUtil from "./position";
-import * as PlayerUtil from "./player";
+// Types
+import type Board from '@sabaki/go-board';
+import type { Sign } from '@sabaki/go-board';
+
+// Utils
+import * as Matrix from './matrixUtil';
+import * as Leitner from './leitner';
+import * as BoardUtil from './board';
+import * as MoveUtil from './move';
+import * as PositionUtil from './position';
+import * as PlayerUtil from './player';
 
 class SingletonUtilStorage {
   public static storedBoard: Board;
@@ -12,14 +16,14 @@ class SingletonUtilStorage {
     keyof Matrix.TransformationCollection<Sign>,
     string
   > = {
-    original: "",
-    rot90: "",
-    rot180: "",
-    rot270: "",
-    mirror: "",
-    mirrorRot90: "",
-    mirrorRot180: "",
-    mirrorRot270: ""
+    original: '',
+    rot90: '',
+    rot180: '',
+    rot270: '',
+    mirror: '',
+    mirrorRot90: '',
+    mirrorRot180: '',
+    mirrorRot270: ''
   };
 }
 
@@ -37,9 +41,9 @@ const getPositionString = (position: Sign[][]) => {
       accumulator +
       currentRow.reduce((rowString, currentValue) => {
         return rowString + (currentValue + 1).toString();
-      }, "")
+      }, '')
     );
-  }, "");
+  }, '');
 };
 
 const getInverseTransformation = (transformation: Matrix.Transformation) => {
@@ -161,7 +165,7 @@ const getAppliedTransformation = (
 ) => {
   if (!positionStrings && !board) {
     throw new Error(
-      "positionStrings must be provided if board is not provided"
+      'positionStrings must be provided if board is not provided'
     );
   }
   positionStrings = positionStrings ?? getAllPositionStrings(board as Board);

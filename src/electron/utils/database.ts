@@ -1,6 +1,6 @@
-import { FileUtil } from ".";
-import { BrowserWindow, ipcMain } from "electron";
-import { EVENTS } from "../../common/events";
+import { FileUtil } from '.';
+import { BrowserWindow, ipcMain } from 'electron';
+import { EVENTS } from '../../common/events';
 
 export const nodeImportDatabase = async () => {
   const win = BrowserWindow.getFocusedWindow();

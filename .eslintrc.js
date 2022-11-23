@@ -1,24 +1,17 @@
 module.exports = {
   root: true,
   env: {
-    node: true,
+    node: true
   },
-  plugins: [
-    '@typescript-eslint',
-    'vue',
-    'html'
-  ],
+  plugins: ['@typescript-eslint', 'vue', 'html'],
   parser: 'vue-eslint-parser',
   parserOptions: {
     parser: '@typescript-eslint/parser',
     ecmaVersion: 'latest',
     sourceType: 'module',
     createDefaultProgram: false,
-    project: [
-      './tsconfig.json',
-      './tsconfig.node.json'
-    ],
-    extraFileExtensions: [".vue"],
+    project: ['./tsconfig.json', './tsconfig.test.json'],
+    extraFileExtensions: ['.vue']
   },
   rules: {
     'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
@@ -26,7 +19,7 @@ module.exports = {
     'require-jsdoc': 'off',
     'valid-jsdoc': 'off',
     'no-unused-vars': 'off',
-    '@typescript-eslint/no-unused-vars': 'error',
+    '@typescript-eslint/no-unused-vars': 'error'
   },
   extends: [
     'eslint:recommended',
@@ -36,14 +29,18 @@ module.exports = {
     'plugin:@typescript-eslint/eslint-recommended',
     'plugin:import/recommended',
     'plugin:import/typescript',
-    "eslint-config-prettier",
+    'eslint-config-prettier'
   ],
   settings: {
     'import/resolver': {
       typescript: {},
       alias: {
-        map: [['@/', './src/renderer'], ['@common/', './src/electron']],
-      },
-    },
-  },
+        map: [
+          ['@/', 'src/renderer'],
+          ['@common/', 'src/common'],
+          ['@electron/', 'src/electron']
+        ]
+      }
+    }
+  }
 };
