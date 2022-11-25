@@ -2,7 +2,7 @@
 node_modules
 .yalc
 /dist
-
+coverage
 
 # local env files
 .env.local

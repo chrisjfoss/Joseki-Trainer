@@ -23,7 +23,6 @@ export default defineComponent({
   },
   setup() {
     onMounted(() => {
-      console.log('Window: ', window);
       window.api.receive(EVENTS.exportDb, async (args?: string[]) => {
         const name = args && args.length > 0 ? args[0] : undefined;
         const buffer = await (

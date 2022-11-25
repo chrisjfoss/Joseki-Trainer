@@ -162,5 +162,32 @@ describe.concurrent('electron -> utils -> file', () => {
       // Assert
       expect(mWriteFile).not.toHaveBeenCalledOnce();
     });
+    it('should throw an error if the save fails', async () => {
+      // Arrange
+      const DEFAULT_NAME = 'test.db';
+      const FILE_PATH = `c:\\example\\path\\${DEFAULT_NAME}`;
+      const BUFFER = new ArrayBuffer(1);
+      mDialog.showSaveDialog.mockResolvedValueOnce({
+        canceled: false,
+        filePath: FILE_PATH
+      });
+      let methodUnderTest: Parameters<typeof fs.writeFile>[2] = () => {};
+      mWriteFile.mockImplementationOnce(
+        (
+          filePath: Parameters<typeof fs.writeFile>[0],
+          buffer: Parameters<typeof fs.writeFile>[1],
+          handler: Parameters<typeof fs.writeFile>[2]
+        ) => {
+          methodUnderTest = handler;
+        }
+      );
+      const toThrow = () => methodUnderTest(new Error());
+
+      // Act
+      await FileUtil.saveBufferToFile(BUFFER, DEFAULT_NAME);
+
+      // Assert
+      expect(toThrow).toThrowError();
+    });
   });
 });

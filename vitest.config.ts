@@ -8,7 +8,10 @@ export default mergeConfig(
   viteConfig,
   defineConfig({
     test: {
-      setupFiles: ['./tests/setup/index.ts']
+      setupFiles: ['./tests/setup/index.ts'],
+      coverage: {
+        exclude: ['**/__mocks__', 'tests']
+      }
     },
     resolve: {
       alias: {

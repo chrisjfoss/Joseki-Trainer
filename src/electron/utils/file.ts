@@ -40,8 +40,6 @@ export const saveBufferToFile = async (
   const dialog = electron.dialog;
   const window = electron.BrowserWindow.getFocusedWindow();
   if (!window) return;
-  console.log('Saving: ', defaultName);
-  console.log('As: ', buffer);
   return dialog
     .showSaveDialog(window, {
       title: 'Save File',
