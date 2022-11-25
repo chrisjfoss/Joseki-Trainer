@@ -17,7 +17,7 @@ process.env.PUBLIC = app.isPackaged
 import { app, BrowserWindow, shell, ipcMain } from 'electron';
 import { release } from 'os';
 import { join } from 'path';
-import { nodeExportDatase } from '../utils/database';
+import { nodeExportDatabase } from '../utils/database';
 import { EVENTS } from '@common/events';
 
 require('./menu');
@@ -45,13 +45,12 @@ const url = process.env.VITE_DEV_SERVER_URL;
 const indexHtml = join(process.env.DIST, 'index.html');
 
 async function createWindow() {
+  console.log('Create window');
   win = new BrowserWindow({
     title: 'Main window',
     icon: join(process.env.PUBLIC, 'favicon.ico'),
     webPreferences: {
-      preload,
-      nodeIntegration: true,
-      contextIsolation: true
+      preload
     }
   });
 
@@ -80,7 +79,7 @@ app.whenReady().then(() => {
   createWindow();
 
   ipcMain.on(EVENTS.exportDbStart, (event, name?: string) => {
-    nodeExportDatase(name);
+    nodeExportDatabase(name);
   });
 });
 
@@ -110,9 +109,7 @@ app.on('activate', () => {
 ipcMain.handle('open-win', (event, arg) => {
   const childWindow = new BrowserWindow({
     webPreferences: {
-      preload,
-      nodeIntegration: true,
-      contextIsolation: true
+      preload
     }
   });
 

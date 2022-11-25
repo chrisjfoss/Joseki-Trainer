@@ -17,6 +17,9 @@
       "@electron/*": [
         "./src/electron/*"
       ],
+      "@tests/*": [
+        "./tests/*"
+      ],
     },
   },
   "include": [

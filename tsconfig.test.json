@@ -12,7 +12,10 @@
       ],
       "@electron/*": [
         "src/electron/*"
-      ]
+      ],
+      "@tests/*": [
+        "tests/*"
+      ],
     }
   },
   "include": [
@@ -21,9 +24,6 @@
   ],
   "exclude": [
     "node_modules",
-    "src",
-    ".eslintrc.js",
-    "package.json"
   ],
   "references": [
     {

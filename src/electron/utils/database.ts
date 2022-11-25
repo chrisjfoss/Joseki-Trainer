@@ -10,7 +10,7 @@ export const nodeImportDatabase = async () => {
   }
 };
 
-export const nodeExportDatase = async (name?: string) => {
+export const nodeExportDatabase = async (name?: string) => {
   const win = BrowserWindow.getFocusedWindow();
   if (win) {
     win.webContents.send(EVENTS.exportDb, [name]);

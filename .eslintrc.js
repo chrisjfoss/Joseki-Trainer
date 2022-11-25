@@ -38,7 +38,8 @@ module.exports = {
         map: [
           ['@/', 'src/renderer'],
           ['@common/', 'src/common'],
-          ['@electron/', 'src/electron']
+          ['@electron/', 'src/electron'],
+          ['@tests/', 'tests']
         ]
       }
     }

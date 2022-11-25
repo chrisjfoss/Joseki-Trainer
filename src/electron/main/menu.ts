@@ -29,7 +29,7 @@ const template = [
     submenu: [
       {
         label: 'Export Current Database',
-        click: () => DatabaseUtil.nodeExportDatase()
+        click: () => DatabaseUtil.nodeExportDatabase()
       },
       {
         label: 'Import Database(s)',

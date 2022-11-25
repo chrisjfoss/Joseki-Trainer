@@ -16,13 +16,6 @@ import { useObservable } from '@vueuse/rxjs';
 import { DatabaseCore, DatabaseApi } from './database';
 import { EVENTS } from '@common/events';
 
-const apiWindow = window as typeof window & {
-  api: {
-    send: Function;
-    receive: Function;
-  };
-};
-
 export default defineComponent({
   name: 'App',
   components: {
@@ -30,17 +23,18 @@ export default defineComponent({
   },
   setup() {
     onMounted(() => {
-      apiWindow.api.receive(EVENTS.exportDb, async (args?: string[]) => {
+      console.log('Window: ', window);
+      window.api.receive(EVENTS.exportDb, async (args?: string[]) => {
         const name = args && args.length > 0 ? args[0] : undefined;
         const buffer = await (
           await DatabaseApi.exportDatabase(name)
         ).arrayBuffer();
-        apiWindow.api.send(EVENTS.exportDbComplete, {
+        window.api.send(EVENTS.exportDbComplete, {
           buffer,
           name: name ?? DatabaseApi.getCurrentDatabaseName()
         });
       });
-      apiWindow.api.receive(
+      window.api.receive(
         EVENTS.importDb,
         async (files: { fileName: string; buffer: Buffer }[][]) => {
           files[0].forEach(async ({ fileName, buffer }) => {
