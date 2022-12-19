@@ -9,6 +9,7 @@ import { alpha } from './GoBoard/ShudanPort/helper';
 // Types
 import type { MoveList, Move } from '@/types';
 import type { Vertex } from '@sabaki/go-board';
+import ScrollableCard from './ScrollableCard';
 
 const props = defineProps({
   moves: {
@@ -91,17 +92,13 @@ const filteredMoves = computed(() => {
 </script>
 <template>
   <div
-    dark
-    :style="{ 'max-height': maxHeight }"
+    class="display-container"
     @mouseleave="emitMouseLeaveAll"
     @focusout="emitMouseLeaveAll"
   >
-    <q-card class="display">
-      <q-card-section class="display__header">
-        <h2 class="header__text">Move List</h2>
-      </q-card-section>
-      <q-separator color="accent" />
-      <q-card-section tag="ul" class="display__moves">
+    <scrollable-card header="Move List">
+      <ul class="moves">
+        <q-separator dark vertical class="moves__separator" />
         <template v-for="(move, i) in filteredMoves" :key="i">
           <li v-if="move.priorMove" class="move">
             <span>{{ i + 1 }}.</span>
@@ -132,42 +129,30 @@ const filteredMoves = computed(() => {
             >
           </li>
         </template>
-      </q-card-section>
-    </q-card>
+      </ul>
+    </scrollable-card>
   </div>
 </template>
 <style scoped lang="scss">
-.display {
-  list-style: none;
-  padding: 0.5rem 1rem;
-  margin: 0;
-  margin: auto;
-  height: 100%;
-  background-color: var(--primary);
-  color: var(--text);
-  align-content: baseline;
-  overflow-y: auto;
-
-  &__moves {
-    padding: 1.5rem 0;
-    margin: 0;
-  }
-
-  &__header {
-    padding: 0 0 0.5rem;
-  }
+.display-container {
+  display: grid;
 }
+.moves {
+  display: grid;
+  grid-template-columns: 1fr min-content 1fr;
+  column-gap: 1rem;
+  padding: 0;
+  margin: 0;
 
-.header {
-  &__text {
-    font-size: 2rem;
-    text-align: center;
+  &__separator {
+    grid-column: 2 / 3;
+    grid-row: 1 / 999;
   }
 }
 
 .move {
   display: grid;
-  grid-template-columns: max-content 35px 35px;
+  grid-template-columns: max-content repeat(2, minmax(min-content, 5rem));
   column-gap: 0.25rem;
   justify-content: start;
   text-align: start;
@@ -182,13 +167,13 @@ const filteredMoves = computed(() => {
     &:hover {
       background-color: var(--text);
       color: var(--background);
-      opacity: 0.2;
+      opacity: 0.8;
     }
   }
 }
 .current {
   background-color: var(--text);
   color: var(--background);
-  opacity: 0.4;
+  opacity: 0.6;
 }
 </style>

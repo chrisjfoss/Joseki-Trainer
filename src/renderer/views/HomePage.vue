@@ -362,19 +362,19 @@ const deletePositions = async () => {
 <style scoped lang="scss">
 .page {
   @include mixin-for-tablet-landscape-up {
-    grid-template-columns: 23rem 1fr;
+    grid-template-columns: 35rem 1fr;
   }
 
   &__sidebar {
     display: grid;
     gap: var(--layout-spacing-base);
-    grid-template-rows: minmax(250px, 1fr) minmax(250px, 1fr);
+    grid-template-rows: minmax(25rem, 1fr) minmax(25rem, 1fr);
     @include mixin-for-tablet-portrait-only {
-      grid-template-rows: minmax(250px, 1fr);
+      grid-template-rows: minmax(25rem, 1fr);
     }
 
     @include mixin-for-tablet-portrait-up {
-      grid-template-columns: repeat(2, 1fr);
+      grid-template-columns: minmax(35rem, 1fr) 1fr;
     }
 
     @include mixin-for-tablet-landscape-up {

@@ -42,13 +42,13 @@ const getMoveDisplay = (candidate: DatabaseTypes.Move, index: number) => {
 };
 </script>
 <template>
-  <ScrollableCard header="Candidate Moves">
+  <scrollable-card header="Candidate Moves">
     <span class="moves">
       <div v-for="(candidate, i) in candidates" :key="i" class="moves__item">
         {{ getMoveDisplay(candidate, i) }}
       </div>
     </span>
-  </ScrollableCard>
+  </scrollable-card>
 </template>
 <style scoped lang="scss">
 .moves {
