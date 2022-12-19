@@ -36,7 +36,7 @@ const showConfirmDeleteModal = ref(false);
 
 const main = ref<HTMLElement | null>(null);
 
-const MAX_BOARD_WIDTH = '800px';
+const MAX_BOARD_WIDTH = '900px';
 
 const boardWidth = ref(main.value?.offsetWidth);
 const sidebarHeight = computed(
@@ -175,6 +175,7 @@ const previousMove = () => {
   }
   processingMove.value = false;
 };
+
 const nextMove = () => {
   processingMove.value = true;
   if (turn.value < moveList.value.length - 1) {
@@ -303,7 +304,7 @@ const deletePositions = async () => {
         :dimensions="{ rows: board.height, columns: board.width }"
       />
     </div>
-    <span ref="main" class="page__main">
+    <div ref="main" class="page__main">
       <GoBoard
         v-model:player="player"
         v-model:moveList="moveList"
@@ -315,7 +316,7 @@ const deletePositions = async () => {
         width="100%"
         @update:board="(val) => (board = val)"
       />
-      <span class="page__actions">
+      <div class="page__actions">
         <q-btn
           no-caps
           class="actions__button"
@@ -340,11 +341,13 @@ const deletePositions = async () => {
           @click="tenuki()"
           >Tenuki</q-btn
         >
-      </span>
-    </span>
+      </div>
+    </div>
+
     <ConfirmDialog
       v-model:show="showConfirmDeleteModal"
       title="Delete moves?"
+      color="negative"
       :loading="loadingPositionCount"
       @confirm="deletePositions()"
     >

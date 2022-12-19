@@ -1,13 +1,17 @@
 <script setup lang="ts">
+// Vue
 import { computed } from 'vue';
+
+// Types
 import type { DatabaseTypes } from '@/database';
-import { alpha } from './GoBoard/ShudanPort/helper';
+
+// Utils
 import { MoveUtil } from '@/utils';
+import { GobanHelper } from 'vue-shudan';
 
 // Components
 import ScrollableCard from './ScrollableCard';
 
-// Define props
 const props = defineProps<{
   position: DatabaseTypes.Position | null;
   dimensions: {
@@ -23,7 +27,7 @@ const getVertexName = (vertex: { x: number; y: number }) => {
   if (!vertex) {
     return '';
   }
-  return `${alpha[vertex.x]}${props.dimensions.rows - vertex.y}`;
+  return `${GobanHelper.alpha[vertex.x]}${props.dimensions.rows - vertex.y}`;
 };
 const getMoveDisplay = (candidate: DatabaseTypes.Move, index: number) => {
   let display = `${index + 1}.`;
