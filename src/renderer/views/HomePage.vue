@@ -299,7 +299,7 @@ const deletePositions = async () => {
         @click="jumpToPosition"
       />
       <CandidateMoveDisplay
-        :position="dbPosition ?? undefined"
+        :position="dbPosition"
         :dimensions="{ rows: board.height, columns: board.width }"
       />
     </div>
@@ -366,7 +366,9 @@ const deletePositions = async () => {
     display: grid;
     gap: var(--layout-spacing-base);
     grid-template-rows: minmax(250px, 1fr) minmax(250px, 1fr);
-    max-height: v-bind(sidebarHeight);
+    @include mixin-for-tablet-portrait-only {
+      grid-template-rows: minmax(250px, 1fr);
+    }
 
     @include mixin-for-tablet-portrait-up {
       grid-template-columns: repeat(2, 1fr);
@@ -376,6 +378,7 @@ const deletePositions = async () => {
       grid-template-columns: 1fr;
       grid-column: 1;
       grid-row: 1 / -1;
+      max-height: v-bind(sidebarHeight);
     }
   }
 

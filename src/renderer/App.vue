@@ -75,7 +75,6 @@ export default defineComponent({
 <style lang="scss">
 #app .container {
   display: grid;
-  gap: var(--layout-spacing-base);
 }
 
 #app .theme-container {
