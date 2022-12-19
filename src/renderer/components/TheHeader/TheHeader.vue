@@ -56,7 +56,7 @@ export default defineComponent({
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1rem;
+  padding: var(--layout-spacing-base);
   background-color: var(--primary);
 }
 .header h1 {
@@ -69,7 +69,9 @@ export default defineComponent({
   align-items: center;
   color: var(--text);
   & a {
-    margin-left: 1rem;
+    &:not(:first-child) {
+      margin-left: var(--layout-spacing-base);
+    }
     text-decoration: none;
     color: var(--text);
   }

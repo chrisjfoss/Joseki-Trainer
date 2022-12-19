@@ -1,5 +1,5 @@
 <template>
-  <div id="train-page">
+  <div class="page page--training">
     <div :style="{ width: targetWidth, height: targetWidth }">
       <TrainingBoard
         v-if="acceptedPosition"
@@ -237,11 +237,8 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-#train-page {
-  margin: 0 1rem;
+.page--training {
   text-align: center;
-  display: grid;
-  column-gap: 1rem;
   grid-template-columns: auto 250px;
 }
 </style>

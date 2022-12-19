@@ -1,20 +1,3 @@
-<template>
-  <q-card id="candidates-display" dark class="candidates-display">
-    <q-card-section class="candidates-display__header">
-      Candidate Moves
-    </q-card-section>
-    <q-separator color="accent" dark inset />
-    <q-card-section class="candidates-display__moves">
-      <div
-        v-for="(candidate, i) in candidates"
-        :key="i"
-        class="candidates-display__move"
-      >
-        {{ getMoveDisplay(candidate, i) }}
-      </div>
-    </q-card-section>
-  </q-card>
-</template>
 <script lang="ts">
 import { computed, defineComponent } from 'vue';
 import type { DatabaseTypes } from '@/database';
@@ -65,19 +48,47 @@ export default defineComponent({
   }
 });
 </script>
+<template>
+  <q-card id="candidates-display" dark class="candidates-display">
+    <q-card-section class="candidates-display__header">
+      Candidate Moves
+    </q-card-section>
+    <q-separator color="accent" dark inset />
+    <q-card-section>
+      <q-scroll-area class="candidates-display__body" visible>
+        <span class="candidates-display__moves">
+          <div
+            v-for="(candidate, i) in candidates"
+            :key="i"
+            class="candidates-display__move"
+          >
+            {{ getMoveDisplay(candidate, i) }}
+          </div>
+        </span>
+      </q-scroll-area>
+    </q-card-section>
+  </q-card>
+</template>
 <style lang="scss" scoped>
 .candidates-display {
   padding: 0;
   background-color: var(--primary);
   color: var(--text);
-
+  display: grid;
+  grid-template-rows: repeat(2, min-content);
+  &__body {
+    height: 100%;
+  }
   &__moves {
     display: grid;
-    gap: 1rem;
+    gap: 0.5rem;
+  }
+  &__move {
+    border-bottom: 1px solid var(--background);
   }
   &__header {
     font-size: 1.5rem;
-    padding: 1rem;
+    padding: 1.4rem 0 1rem;
     font-weight: normal;
     text-align: center;
     margin: 0;

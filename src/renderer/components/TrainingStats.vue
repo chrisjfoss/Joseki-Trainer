@@ -1,8 +1,8 @@
 <script lang="ts">
-import { computed, defineComponent } from "vue";
+import { computed, defineComponent } from 'vue';
 
 export default defineComponent({
-  name: "TrainingStats",
+  name: 'TrainingStats',
   props: {
     numberCorrect: {
       type: Number,

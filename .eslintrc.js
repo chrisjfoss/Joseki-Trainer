@@ -19,7 +19,16 @@ module.exports = {
     'require-jsdoc': 'off',
     'valid-jsdoc': 'off',
     'no-unused-vars': 'off',
-    '@typescript-eslint/no-unused-vars': 'error'
+    '@typescript-eslint/no-unused-vars': 'error',
+    // https://github.com/vue-a11y/eslint-plugin-vuejs-accessibility/blob/main/docs/label-has-for.md
+    'vuejs-accessibility/label-has-for': [
+      'error',
+      {
+        required: {
+          some: ['nesting', 'id']
+        }
+      }
+    ]
   },
   extends: [
     'eslint:recommended',

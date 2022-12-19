@@ -8,7 +8,8 @@ import {
   type Ref,
   ref,
   watch,
-  watchEffect
+  watchEffect,
+  onUnmounted
 } from 'vue';
 
 // Types
@@ -23,6 +24,7 @@ import {
 } from '@/database';
 import { MoveUtil, PlayerUtil } from '@/utils';
 import Board from '@sabaki/go-board';
+import { debounce } from 'lodash';
 
 // Components
 import ConfirmDialog from '@/components/ConfirmDialog';
@@ -31,6 +33,29 @@ import CandidateMoveDisplay from '@/components/CandidateMoveDisplay.vue';
 import MoveDisplay from '@/components/MoveDisplay.vue';
 
 const showConfirmDeleteModal = ref(false);
+
+const main = ref<HTMLElement | null>(null);
+
+const MAX_BOARD_WIDTH = '800px';
+
+const boardWidth = ref(main.value?.offsetWidth);
+const sidebarHeight = computed(
+  () => `${Math.min(boardWidth.value ?? 0, Number.parseInt(MAX_BOARD_WIDTH))}px`
+);
+
+// TODO: Modify vue-shudan to return this value in an event
+const grabBoardWidth = debounce(() => {
+  boardWidth.value = main.value?.offsetWidth;
+}, 100);
+
+onMounted(() => {
+  grabBoardWidth();
+  window.addEventListener('resize', grabBoardWidth);
+});
+
+onUnmounted(() => {
+  window.removeEventListener('resize', grabBoardWidth);
+});
 
 const rows = ref(19);
 const columns = ref(19);
@@ -278,7 +303,7 @@ const deletePositions = async () => {
         :dimensions="{ rows: board.height, columns: board.width }"
       />
     </div>
-    <span class="page__main">
+    <span ref="main" class="page__main">
       <GoBoard
         v-model:player="player"
         v-model:moveList="moveList"
@@ -333,18 +358,15 @@ const deletePositions = async () => {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
 .page {
-  margin: 0 1rem;
-  display: grid;
-  gap: 1rem;
-
   @include mixin-for-tablet-landscape-up {
     grid-template-columns: 23rem 1fr;
   }
 
   &__sidebar {
     display: grid;
-    gap: 1rem;
-    grid-template-rows: minmax(250px, 1fr) minmax(250px, min-content);
+    gap: var(--layout-spacing-base);
+    grid-template-rows: minmax(250px, 1fr) minmax(250px, 1fr);
+    max-height: v-bind(sidebarHeight);
 
     @include mixin-for-tablet-portrait-up {
       grid-template-columns: repeat(2, 1fr);
@@ -366,10 +388,10 @@ const deletePositions = async () => {
 
   &__actions {
     grid-column: 1 / -1;
-    max-width: 800px;
+    max-width: v-bind(MAX_BOARD_WIDTH);
     display: grid;
     grid-template-columns: repeat(2, max-content) 1fr max-content;
-    gap: 1rem;
+    gap: var(--layout-spacing-base);
   }
 }
 

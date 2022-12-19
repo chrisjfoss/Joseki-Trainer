@@ -1,5 +1,5 @@
 <template>
-  <div class="theme-container theme-light">
+  <div class="theme-container theme theme--earth">
     <div class="container">
       <TheHeader />
       <router-view></router-view>
@@ -75,7 +75,7 @@ export default defineComponent({
 <style lang="scss">
 #app .container {
   display: grid;
-  gap: 1rem;
+  gap: var(--layout-spacing-base);
 }
 
 #app .theme-container {

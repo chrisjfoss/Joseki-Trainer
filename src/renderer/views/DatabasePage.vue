@@ -1,5 +1,5 @@
 <template>
-  <div class="database-page">
+  <div class="page database-page">
     <section class="databases">
       <h2 class="databases__header">Databases (Edit & Delete)</h2>
       <ul class="databases__list">
@@ -19,28 +19,31 @@
       </ul>
     </section>
     <section class="database__create">
-      <p>Create a new database</p>
-      <input
-        v-model="newDatabaseName"
-        type="text"
-        placeholder="Database name"
-      />
-      <p>Player:</p>
-      <select v-model="newDatabasePlayer">
-        <option value="0">All</option>
-        <option value="-1">Black</option>
-        <option value="1">White</option>
-      </select>
-
+      <label>
+        Create a new database
+        <input
+          v-model="newDatabaseName"
+          type="text"
+          placeholder="Database name"
+        />
+      </label>
+      <label>
+        Player:
+        <select v-model="newDatabasePlayer">
+          <option value="0">All</option>
+          <option value="-1">Black</option>
+          <option value="1">White</option>
+        </select>
+      </label>
       <button @click="createDatabase">Create</button>
     </section>
   </div>
 </template>
 <script lang="ts">
-import { DatabaseApi } from "@/database";
-import { defineComponent, inject, onMounted, ref, watch } from "vue";
-import type { Ref } from "vue";
-import { EVENTS } from "@common/events";
+import { DatabaseApi } from '@/database';
+import { defineComponent, inject, onMounted, ref, watch } from 'vue';
+import type { Ref } from 'vue';
+import { EVENTS } from '@common/events';
 
 const apiWindow = window as typeof window & {
   api: {
@@ -50,7 +53,7 @@ const apiWindow = window as typeof window & {
 };
 
 export default defineComponent({
-  name: "DatabasePage",
+  name: 'DatabasePage',
   setup() {
     // Get databases
     const databases: Ref<string[]> = ref([]);
@@ -61,7 +64,7 @@ export default defineComponent({
       apiWindow.api.send(EVENTS.exportDbStart, name);
     };
 
-    const refetchDatabaseInfo = inject("refetchDatabaseInfo") as Ref<boolean>;
+    const refetchDatabaseInfo = inject('refetchDatabaseInfo') as Ref<boolean>;
     const deleteDb = async (name: string) => {
       refetchDatabaseInfo.value = false;
       await deleteDatabase(name);
@@ -77,8 +80,8 @@ export default defineComponent({
       }
     });
 
-    const newDatabaseName = ref("");
-    const newDatabasePlayer = ref("0") as Ref<"0" | "1" | "-1">;
+    const newDatabaseName = ref('');
+    const newDatabasePlayer = ref('0') as Ref<'0' | '1' | '-1'>;
 
     const createDatabase = async () => {
       const name = newDatabaseName.value;
@@ -86,7 +89,7 @@ export default defineComponent({
         refetchDatabaseInfo.value = false;
         await DatabaseApi.createDatabase(
           name,
-          Number.parseInt(newDatabasePlayer.value ?? "0") as 0 | 1 | -1
+          Number.parseInt(newDatabasePlayer.value ?? '0') as 0 | 1 | -1
         );
         await DatabaseApi.switchToDatabase(name);
         refetchDatabaseInfo.value = true;
@@ -105,11 +108,6 @@ export default defineComponent({
 });
 </script>
 <style scoped lang="scss">
-.database-page {
-  margin: 0 1rem;
-  display: grid;
-  gap: 1rem;
-}
 .database {
   &__create {
     background-color: var(--primary);
@@ -148,7 +146,7 @@ export default defineComponent({
     padding: 0.75rem;
   }
 }
-p {
+label {
   color: var(--text);
 }
 </style>

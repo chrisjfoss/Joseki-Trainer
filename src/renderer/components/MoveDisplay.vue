@@ -96,11 +96,13 @@ const filteredMoves = computed(() => {
     @mouseleave="emitMouseLeaveAll"
     @focusout="emitMouseLeaveAll"
   >
-    <q-card tag="ul" class="move-list">
-      <q-card-section class="move-list__header"> Move List </q-card-section>
-      <q-separator color="accent" dark inset />
-      <q-card-section horizontal>
-        <span v-for="(move, i) in filteredMoves" :key="i">
+    <q-card class="display">
+      <q-card-section class="display__header">
+        <h2 class="header__text">Move List</h2>
+      </q-card-section>
+      <q-separator color="accent" />
+      <q-card-section tag="ul" class="display__moves">
+        <template v-for="(move, i) in filteredMoves" :key="i">
           <li v-if="move.priorMove" class="move">
             <span>{{ i + 1 }}.</span>
             <span
@@ -129,31 +131,43 @@ const filteredMoves = computed(() => {
               {{ getVertexName(moves[2 * i + 2].priorMove) }}</span
             >
           </li>
-        </span>
+        </template>
       </q-card-section>
     </q-card>
   </div>
 </template>
 <style scoped lang="scss">
-.move-list {
+.display {
   list-style: none;
-  padding: 1.5rem;
+  padding: 0.5rem 1rem;
   margin: 0;
-  display: grid;
-  grid-template-columns: repeat(2, max-content);
-  row-gap: 0.5rem;
-  column-gap: 1rem;
   margin: auto;
   height: 100%;
   background-color: var(--primary);
   color: var(--text);
   align-content: baseline;
   overflow-y: auto;
+
+  &__moves {
+    padding: 1.5rem 0;
+    margin: 0;
+  }
+
+  &__header {
+    padding: 0 0 0.5rem;
+  }
+}
+
+.header {
+  &__text {
+    font-size: 2rem;
+    text-align: center;
+  }
 }
 
 .move {
   display: grid;
-  grid-template-columns: max-content 1fr 1fr;
+  grid-template-columns: max-content 35px 35px;
   column-gap: 0.25rem;
   justify-content: start;
   text-align: start;
@@ -161,10 +175,15 @@ const filteredMoves = computed(() => {
   cursor: pointer;
   width: 100%;
 
-  .turn:hover {
-    background-color: var(--text);
-    color: var(--background);
-    opacity: 0.2;
+  .turn {
+    &:last-of-type {
+      margin-left: 0.25rem;
+    }
+    &:hover {
+      background-color: var(--text);
+      color: var(--background);
+      opacity: 0.2;
+    }
   }
 }
 .current {

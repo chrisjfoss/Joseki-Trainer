@@ -1,5 +1,5 @@
 <template>
-  <div class="statistics-page">
+  <div class="page">
     <div class="statistics">
       <h2 class="statistics__header">Upcoming Problems</h2>
       <div
@@ -57,11 +57,6 @@ export default defineComponent({
 });
 </script>
 <style lang="scss" scoped>
-.statistics-page {
-  margin: 0 1rem;
-  display: grid;
-  gap: 1rem;
-}
 .statistics {
   color: var(--text);
   background: var(--primary);

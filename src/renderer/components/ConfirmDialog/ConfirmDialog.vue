@@ -38,7 +38,7 @@ const confirm = () => {
 };
 </script>
 <template>
-  <q-dialog v-model="showModal" persistent class="theme-light">
+  <q-dialog v-model="showModal" persistent class="theme theme--earth">
     <q-card class="dialog">
       <q-card-section class="dialog__title">
         <slot name="title">
