@@ -1,5 +1,5 @@
-import { type DatabaseTypes} from "@/database";
-import { Vertex } from "@sabaki/go-board";
+import type { DatabaseTypes } from '@/database';
+import type { Vertex } from '@sabaki/go-board';
 
 export const isTenuki = (move: DatabaseTypes.Move | Vertex | null) => {
   if (!move) return false;

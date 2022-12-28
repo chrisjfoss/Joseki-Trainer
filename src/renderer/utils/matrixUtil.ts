@@ -1,4 +1,4 @@
-import { Vertex } from "@sabaki/go-board";
+import type { Vertex } from '@sabaki/go-board';
 
 export type TransformationCollection<T> = Record<
   keyof typeof Transformation,

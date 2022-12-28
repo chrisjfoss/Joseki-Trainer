@@ -19,9 +19,18 @@ const props = defineProps({
     type: String,
     required: false,
     default: ''
+  },
+  color: {
+    type: String,
+    required: false,
+    default: 'primary'
   }
 });
 const emit = defineEmits(['update:show', 'confirm']);
+
+const modalColor = computed(() => {
+  return `bg-${props.color}`;
+});
 
 const showModal = computed({
   get: () => {
@@ -38,9 +47,9 @@ const confirm = () => {
 };
 </script>
 <template>
-  <q-dialog v-model="showModal" persistent class="theme-light">
+  <q-dialog v-model="showModal" persistent class="theme theme--earth">
     <q-card class="dialog">
-      <q-card-section class="dialog__title">
+      <q-card-section v-if="title" class="dialog__title" :class="modalColor">
         <slot name="title">
           <h2 class="header">{{ title }}</h2>
         </slot>
@@ -54,7 +63,7 @@ const confirm = () => {
         <q-btn v-close-popup flat label="Cancel" color="primary" />
         <q-btn
           label="Confirm"
-          color="primary"
+          :color="color"
           :loading="loading"
           @click="confirm"
         />
@@ -66,7 +75,6 @@ const confirm = () => {
 .dialog {
   min-width: 300px;
   &__title {
-    background-color: var(--primary);
     color: var(--text);
   }
 }

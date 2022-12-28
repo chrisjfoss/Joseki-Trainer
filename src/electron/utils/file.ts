@@ -1,6 +1,6 @@
-import electron from "electron";
-import path from "path";
-import fs from "fs";
+import electron from 'electron';
+import path from 'path';
+import fs from 'fs';
 
 export const openDbFiles = async () => {
   const dialog = electron.dialog;
@@ -8,16 +8,16 @@ export const openDbFiles = async () => {
   if (!window) return;
   return await dialog
     .showOpenDialog({
-      title: "Import Database",
-      buttonLabel: "Import",
+      title: 'Import Database',
+      buttonLabel: 'Import',
       // Restricting the user to only db files
       filters: [
         {
-          name: "Database",
-          extensions: ["db"]
+          name: 'Database',
+          extensions: ['db']
         }
       ],
-      properties: ["openFile", "multiSelections"]
+      properties: ['openFile', 'multiSelections']
     })
     .then((files) => {
       if (!files.canceled) {
@@ -33,30 +33,35 @@ export const openDbFiles = async () => {
     });
 };
 
-export const saveBufferToFile = (buffer: ArrayBuffer, defaultName: string) => {
+export const saveBufferToFile = async (
+  buffer: ArrayBuffer,
+  defaultName: string
+) => {
   const dialog = electron.dialog;
   const window = electron.BrowserWindow.getFocusedWindow();
   if (!window) return;
-  console.log("Saving: ", defaultName);
-  console.log("As: ", buffer);
-  dialog
+  return dialog
     .showSaveDialog(window, {
-      title: "Save File",
+      title: 'Save File',
       defaultPath: path.join(__dirname, `${defaultName}.db`),
-      buttonLabel: "Save",
+      buttonLabel: 'Save',
       // Restricting the user to only db files
       filters: [
         {
-          name: "Database Files",
-          extensions: ["db"]
+          name: 'Database Files',
+          extensions: ['db']
         }
       ],
-      properties: ["showOverwriteConfirmation"]
+      properties: ['showOverwriteConfirmation']
     })
     .then(async (file) => {
       if (file.canceled) return;
-      fs.writeFile(file.filePath!.toString(), Buffer.from(buffer), (err) => {
-        if (err) throw err;
-      });
+      return fs.writeFile(
+        file.filePath!.toString(),
+        Buffer.from(buffer),
+        (err) => {
+          if (err) throw err;
+        }
+      );
     });
 };

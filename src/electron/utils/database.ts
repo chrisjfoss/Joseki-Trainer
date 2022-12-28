@@ -1,6 +1,6 @@
-import { FileUtil } from ".";
-import { BrowserWindow, ipcMain } from "electron";
-import { EVENTS } from "../../common/events";
+import { FileUtil } from '.';
+import { BrowserWindow, ipcMain } from 'electron';
+import { EVENTS } from '../../common/events';
 
 export const nodeImportDatabase = async () => {
   const win = BrowserWindow.getFocusedWindow();
@@ -10,7 +10,7 @@ export const nodeImportDatabase = async () => {
   }
 };
 
-export const nodeExportDatase = async (name?: string) => {
+export const nodeExportDatabase = async (name?: string) => {
   const win = BrowserWindow.getFocusedWindow();
   if (win) {
     win.webContents.send(EVENTS.exportDb, [name]);

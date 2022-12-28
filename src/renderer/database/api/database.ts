@@ -1,18 +1,18 @@
-import { IndexableType } from "dexie";
-import {
-  DatabaseCore
-} from "..";
-import { exportDB, importInto } from "dexie-export-import";
+import type { IndexableType } from 'dexie';
+import { DatabaseCore } from '..';
+import { exportDB, importInto } from 'dexie-export-import';
 
 export const deleteDatabase = async (name: string) => {
   const currentDatabase = getCurrentDatabaseName();
   const database = await getDatabaseByName(name);
   if (name === currentDatabase) {
-    await switchToDatabase("default");
+    await switchToDatabase('default');
   }
   const dbToDelete = DatabaseCore.getNewDatabaseInstance(name);
   if (database) {
-    await DatabaseCore.repositoryDb.repositories.delete(database.id as IndexableType);
+    await DatabaseCore.repositoryDb.repositories.delete(
+      database.id as IndexableType
+    );
   }
   await dbToDelete.delete();
 };
@@ -25,11 +25,11 @@ export const createDatabase = async (
   if (DatabaseCore.db.name === name) {
     return false;
   }
-  if (!database && name !== "default") {
-    console.log("Creating new database", name);
-    console.log("Old Database: ", database);
+  if (!database && name !== 'default') {
+    console.log('Creating new database', name);
+    console.log('Old Database: ', database);
     DatabaseCore.repositoryDb.repositories.add({ name, player: player || 0 });
-    console.log("Created database", name);
+    console.log('Created database', name);
     return true;
   }
   return false;
@@ -41,7 +41,7 @@ export const renameDatabase = async (
 ): Promise<boolean> => {
   const newDatabase = await getDatabaseByName(newName);
   if (newDatabase) {
-    throw new Error("Name already taken");
+    throw new Error('Name already taken');
   }
   const oldDb = await exportDatabase(oldName);
   await importDatabase(newName, oldDb);
@@ -57,7 +57,7 @@ export const getCurrentDatabaseName = () => {
 export const getRepositoryPlayer = async (name?: string) => {
   const dbName = name ? name : getCurrentDatabaseName();
   const repository = await DatabaseCore.repositoryDb.repositories
-    .where("name")
+    .where('name')
     .equals(dbName)
     .first();
   return repository?.player ?? 0;
@@ -69,11 +69,15 @@ export const switchToDatabase = async (name: string) => {
   }
   await createDatabase(name);
 
-  const activeRepository = await DatabaseCore.repositoryDb.activeRepository.toArray();
+  const activeRepository =
+    await DatabaseCore.repositoryDb.activeRepository.toArray();
   if (activeRepository.length > 0 && activeRepository[0].id) {
-    await DatabaseCore.repositoryDb.activeRepository.update(activeRepository[0].id, {
-      name
-    });
+    await DatabaseCore.repositoryDb.activeRepository.update(
+      activeRepository[0].id,
+      {
+        name
+      }
+    );
   } else {
     await DatabaseCore.repositoryDb.activeRepository.add({ name });
   }
@@ -84,19 +88,21 @@ export const switchToDatabase = async (name: string) => {
 
 export const getAvailableDatabases = async () => {
   const databases = await DatabaseCore.repositoryDb.repositories.toArray();
-  return ["default", ...databases.map(({ name }) => name)];
+  return ['default', ...databases.map(({ name }) => name)];
 };
 
 export const getDatabaseByName = async (name: string) => {
   const database = await DatabaseCore.repositoryDb.repositories
-    .where("name")
+    .where('name')
     .equals(name)
     .first();
   return database;
 };
 
 export const getDatabaseRepository = async (name?: string) => {
-  return name ? DatabaseCore.getNewDatabaseInstance(name) || DatabaseCore.db : DatabaseCore.db;
+  return name
+    ? DatabaseCore.getNewDatabaseInstance(name) || DatabaseCore.db
+    : DatabaseCore.db;
 };
 
 export const exportDatabase = async (name?: string) => {

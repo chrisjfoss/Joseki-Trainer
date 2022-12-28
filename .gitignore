@@ -2,7 +2,7 @@
 node_modules
 .yalc
 /dist
-
+coverage
 
 # local env files
 .env.local
@@ -26,3 +26,5 @@ pnpm-debug.log*
 #Electron-builder output
 /dist-electron
 /release
+
+tsconfig.tsbuildinfo

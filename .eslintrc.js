@@ -1,24 +1,17 @@
 module.exports = {
   root: true,
   env: {
-    node: true,
+    node: true
   },
-  plugins: [
-    '@typescript-eslint',
-    'vue',
-    'html'
-  ],
+  plugins: ['@typescript-eslint', 'vue', 'html'],
   parser: 'vue-eslint-parser',
   parserOptions: {
     parser: '@typescript-eslint/parser',
     ecmaVersion: 'latest',
     sourceType: 'module',
     createDefaultProgram: false,
-    project: [
-      './tsconfig.json',
-      './tsconfig.node.json'
-    ],
-    extraFileExtensions: [".vue"],
+    project: ['./tsconfig.json', './tsconfig.test.json'],
+    extraFileExtensions: ['.vue']
   },
   rules: {
     'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
@@ -27,6 +20,15 @@ module.exports = {
     'valid-jsdoc': 'off',
     'no-unused-vars': 'off',
     '@typescript-eslint/no-unused-vars': 'error',
+    // https://github.com/vue-a11y/eslint-plugin-vuejs-accessibility/blob/main/docs/label-has-for.md
+    'vuejs-accessibility/label-has-for': [
+      'error',
+      {
+        required: {
+          some: ['nesting', 'id']
+        }
+      }
+    ]
   },
   extends: [
     'eslint:recommended',
@@ -36,14 +38,19 @@ module.exports = {
     'plugin:@typescript-eslint/eslint-recommended',
     'plugin:import/recommended',
     'plugin:import/typescript',
-    "eslint-config-prettier",
+    'eslint-config-prettier'
   ],
   settings: {
     'import/resolver': {
       typescript: {},
       alias: {
-        map: [['@/', './src/renderer'], ['@common/', './src/electron']],
-      },
-    },
-  },
+        map: [
+          ['@/', 'src/renderer'],
+          ['@common/', 'src/common'],
+          ['@electron/', 'src/electron'],
+          ['@tests/', 'tests']
+        ]
+      }
+    }
+  }
 };

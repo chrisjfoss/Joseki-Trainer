@@ -1,4 +1,4 @@
-import { IndexableType } from "dexie";
+import type { IndexableType } from 'dexie';
 
 export interface Move {
   id?: number;

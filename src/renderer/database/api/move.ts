@@ -1,15 +1,16 @@
-import { Training } from "@/constants";
-import type { DatabaseTypes } from "@/database";
-import { getAppliedTransformation, Leitner, Matrix, PlayerUtil } from "@/utils";
-import { getVerticeTransformation } from "@/utils/matrixUtil";
-import GoBoard, { Vertex } from "@sabaki/go-board";
-import type { IndexableType } from "dexie";
-import { DatabaseApi, PositionApi } from ".";
+import { Training } from '@/constants';
+import type { DatabaseTypes } from '@/database';
+import { getAppliedTransformation, Leitner, Matrix, PlayerUtil } from '@/utils';
+import { getVerticeTransformation } from '@/utils/matrixUtil';
+import type GoBoard from '@sabaki/go-board';
+import type { Vertex } from '@sabaki/go-board';
+import type { IndexableType } from 'dexie';
+import { DatabaseApi, PositionApi } from '.';
 import {
   getOriginalPositionFromBoard,
   getPositionFromBoard,
   savePosition
-} from "./position";
+} from './position';
 
 export const getAllMoves = async (name?: string) => {
   const db = await DatabaseApi.getDatabaseRepository(name);
@@ -95,10 +96,7 @@ export const getMovesByPositionId = async (
 ) => {
   const db = await DatabaseApi.getDatabaseRepository(dbName);
   // Get all moves for the position
-  return db.moves
-    .where("previousPositionId")
-    .equals(positionId)
-    .toArray();
+  return db.moves.where('previousPositionId').equals(positionId).toArray();
 };
 
 export const removeLine = async (moveId: IndexableType) => {
@@ -134,7 +132,7 @@ export const getMoveByPrevAndCurrentPositionId = async (
 ) => {
   const db = await DatabaseApi.getDatabaseRepository();
   return db.moves
-    .where("previousPositionId")
+    .where('previousPositionId')
     .equals(prevPositionId)
     .and((move) => move.positionId === currentPositionId)
     .first();
@@ -143,7 +141,7 @@ export const getMoveByPrevAndCurrentPositionId = async (
 export const getMovesToReachPositionId = async (positionId: IndexableType) => {
   const db = await DatabaseApi.getDatabaseRepository();
   // Get all moves for the position
-  return db.moves.where("positionId").equals(positionId).toArray();
+  return db.moves.where('positionId').equals(positionId).toArray();
 };
 
 export const trainedMove = async (moveId: number, result: Training.Result) => {
@@ -187,12 +185,14 @@ export const saveMove = async (
   const db = await DatabaseApi.getDatabaseRepository();
   // CURRENT POSITION - after move //
   const dbPosition = await getPositionFromBoard(board, player);
-  const positionId =
-    dbPosition?.id ?? (await savePosition(board, player));
+  const positionId = dbPosition?.id ?? (await savePosition(board, player));
 
   // PREVIOUS POSITION - prior to move //
   const previousDbPosition = previousBoard
-    ? await getOriginalPositionFromBoard(previousBoard, PlayerUtil.getOtherPlayer(player))
+    ? await getOriginalPositionFromBoard(
+        previousBoard,
+        PlayerUtil.getOtherPlayer(player)
+      )
     : undefined;
   const previousPositionId =
     previousDbPosition?.id ??
@@ -211,18 +211,14 @@ export const saveMove = async (
   );
 
   const dbMove = await db.moves
-    .where("previousPositionId")
+    .where('previousPositionId')
     .equals(previousPositionId)
     .and((move) => move.positionId === positionId)
     .first();
 
   const moveId =
     dbMove?.id ??
-    (await addMove(
-      transformedMove,
-      positionId,
-      previousPositionId
-    ));
+    (await addMove(transformedMove, positionId, previousPositionId));
 
   return {
     positionId,
@@ -244,7 +240,7 @@ const addMove = async (
     },
     positionId,
     previousPositionId: previousPositionId ?? 0,
-    comments: "",
+    comments: '',
 
     // 10 is the "Current deck"
     deck: 10,

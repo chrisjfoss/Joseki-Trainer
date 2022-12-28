@@ -1,12 +1,12 @@
 <script lang="ts">
-import { DatabaseApi } from "@/database";
-import { defineComponent, inject, Ref, ref, watch } from "vue";
+import { DatabaseApi } from '@/database';
+import { defineComponent, inject, type Ref, ref, watch } from 'vue';
 
 export default defineComponent({
-  name: "TheHeader",
+  name: 'TheHeader',
   setup() {
-    const currentDatabase = inject("currentDatabase") as Ref<string>;
-    const refetchDatabaseInfo = inject("refetchDatabaseInfo") as Ref<string>;
+    const currentDatabase = inject('currentDatabase') as Ref<string>;
+    const refetchDatabaseInfo = inject('refetchDatabaseInfo') as Ref<string>;
 
     const databases = ref([] as string[]);
     const updateDatabaseList = async () => {
@@ -40,10 +40,14 @@ export default defineComponent({
       <router-link to="/statistics">Statistics</router-link>
     </div>
     <div class="nav nav--end">
-      <label for="database-select">Database:</label>
-      <select id="database-select" v-model="currentDatabase">
-        <option v-for="db in databases" :key="db" :value="db">{{ db }}</option>
-      </select>
+      <label for="database-select">
+        Database:
+        <select id="database-select" v-model="currentDatabase">
+          <option v-for="db in databases" :key="db" :value="db">
+            {{ db }}
+          </option>
+        </select>
+      </label>
     </div>
   </div>
 </template>
@@ -65,7 +69,9 @@ export default defineComponent({
   align-items: center;
   color: var(--text);
   & a {
-    margin-left: 1rem;
+    &:not(:first-child) {
+      margin-left: 1rem;
+    }
     text-decoration: none;
     color: var(--text);
   }

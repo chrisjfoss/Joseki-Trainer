@@ -1,5 +1,5 @@
 import { app, Menu } from 'electron';
-import { nodeExportDatase, nodeImportDatabase } from '../utils/database';
+import { DatabaseUtil } from '../utils';
 
 const isMac = process.platform === 'darwin';
 
@@ -29,11 +29,11 @@ const template = [
     submenu: [
       {
         label: 'Export Current Database',
-        click: () => nodeExportDatase()
+        click: () => DatabaseUtil.nodeExportDatabase()
       },
       {
         label: 'Import Database(s)',
-        click: () => nodeImportDatabase()
+        click: () => DatabaseUtil.nodeImportDatabase()
       },
       { role: isMac ? 'close' : 'quit' }
     ]

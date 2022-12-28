@@ -1,8 +1,12 @@
-import { Vertex } from "@/components/GoBoard/ShudanPort/types";
-import { type DatabaseTypes } from "@/database";
-import GoBoard, { Sign, SignMap } from "@sabaki/go-board";
-import _ from "lodash";
-import { getAllPositionStrings, getRelativeTransformation, Matrix } from ".";
+import GoBoard, { type Sign, type SignMap } from '@sabaki/go-board';
+
+// Types
+import type { Vertex } from '@/components/GoBoard/ShudanPort/types';
+import type { DatabaseTypes } from '@/database';
+
+// Utils
+import { cloneDeep } from 'lodash';
+import { getAllPositionStrings, getRelativeTransformation, Matrix } from '.';
 
 interface GoBoardWithKo extends GoBoard {
   _koInfo: { sign: Sign; vertex: Vertex };
@@ -52,7 +56,7 @@ export const applyTransformation = (
   board: GoBoard,
   transformation: Matrix.Transformation
 ) => {
-  const newBoard = _.cloneDeep(board) as GoBoardWithKo;
+  const newBoard = cloneDeep(board) as GoBoardWithKo;
 
   // Get new signMap
   newBoard.signMap = Matrix.getTransformation(transformation, board.signMap);

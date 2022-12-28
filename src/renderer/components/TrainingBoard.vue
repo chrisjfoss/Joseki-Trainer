@@ -1,15 +1,23 @@
 <script lang="ts">
-import { computed, PropType } from "vue";
-import { defineComponent } from "@vue/runtime-core";
-import Board from "@sabaki/go-board";
-import GoBoard from "./GoBoard.vue";
-import { MoveList } from "@/types";
-import { Training } from "@/constants";
-import type { DatabaseTypes } from "@/database";
-import { BoardUtil } from "@/utils";
+// Vue
+import { computed, type PropType, defineComponent } from 'vue';
+
+// Components
+import GoBoard from './GoBoard.vue';
+
+// Constants
+import { Training } from '@/constants';
+
+// Types
+import type { MoveList } from '@/types';
+import type { DatabaseTypes } from '@/database';
+
+// Utils
+import { BoardUtil } from '@/utils';
+import Board from '@sabaki/go-board';
 
 export default defineComponent({
-  name: "TrainingBoard",
+  name: 'TrainingBoard',
   components: {
     GoBoard
   },
@@ -17,7 +25,7 @@ export default defineComponent({
     width: {
       type: [String, Number],
       required: false,
-      default: "100%"
+      default: '100%'
     },
     candidatePositions: {
       type: Array as PropType<DatabaseTypes.Position[]>,
@@ -51,7 +59,7 @@ export default defineComponent({
       default: true
     }
   },
-  emits: ["solved-position", "update:player", "update:turn", "update:moveList"],
+  emits: ['solved-position', 'update:player', 'update:turn', 'update:moveList'],
   setup(props, context) {
     const acceptedBoard = computed(() => {
       return BoardUtil.getBoardFromPosition(
@@ -84,19 +92,19 @@ export default defineComponent({
         }))
         .filter((candidateInfo) => candidateInfo.equal);
       if (madeAcceptedMove.equal) {
-        context.emit("solved-position", {
+        context.emit('solved-position', {
           result: Training.Result.solved,
           board,
           transformation: madeAcceptedMove.transformation
         });
       } else if (madeCandidateMove.length > 0) {
-        context.emit("solved-position", {
+        context.emit('solved-position', {
           result: Training.Result.alternate,
           board,
           transformation: madeCandidateMove[0].transformation
         });
       } else {
-        context.emit("solved-position", {
+        context.emit('solved-position', {
           result: Training.Result.failed,
           board
         });
@@ -109,7 +117,7 @@ export default defineComponent({
       },
       set: (value) => {
         if (!props.interactable) return;
-        context.emit("update:player", value);
+        context.emit('update:player', value);
       }
     });
 
@@ -118,7 +126,7 @@ export default defineComponent({
         return props.moveList;
       },
       set: (value) => {
-        context.emit("update:moveList", value);
+        context.emit('update:moveList', value);
       }
     });
 
@@ -127,7 +135,7 @@ export default defineComponent({
         return props.turn;
       },
       set: (value) => {
-        context.emit("update:turn", value);
+        context.emit('update:turn', value);
       }
     });
 
