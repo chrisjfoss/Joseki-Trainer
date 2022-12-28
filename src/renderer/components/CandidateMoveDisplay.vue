@@ -44,15 +44,30 @@ const getMoveDisplay = (candidate: DatabaseTypes.Move, index: number) => {
 <template>
   <scrollable-card header="Candidate Moves">
     <span class="moves">
-      <div v-for="(candidate, i) in candidates" :key="i" class="moves__item">
-        {{ getMoveDisplay(candidate, i) }}
-      </div>
+      <template v-for="(candidate, i) in candidates" :key="i">
+        <div class="moves__item">
+          {{ getMoveDisplay(candidate, i) }}
+        </div>
+        <q-separator
+          v-if="i + 1 < candidates.length"
+          dark
+          class="moves__separator"
+        />
+      </template>
     </span>
   </scrollable-card>
 </template>
 <style scoped lang="scss">
 .moves {
   display: grid;
-  gap: 0.5rem;
+  &__item {
+    padding: 0.5rem 0;
+    &:first-child {
+      padding: 0 0 0.5rem;
+    }
+  }
+  &__separator {
+    margin-right: 1rem;
+  }
 }
 </style>
